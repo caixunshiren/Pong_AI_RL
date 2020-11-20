@@ -140,6 +140,11 @@ def reset_round():
     reward_info = []
 
 def forward_prop():
+    '''
+    To be completed: implement forward prop based on the params
+
+
+    '''
     global params
     print(params)
     return np.random.uniform()
@@ -200,7 +205,7 @@ def train():
     global Xtrain
     global Ytrain
     global params
-    params = bt.train_bot(Xtrain, Ytrain)
+    params = bt.train_bot(Xtrain, Ytrain, params)
 
 def save_params():
     global params
