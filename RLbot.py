@@ -31,27 +31,32 @@ Xtrain = []
 Ytrain = []
 params= ["no param rn", "noooooo!"]
 
-def store_frame_info(paddle_frect, other_paddle_frect, ball_frect):
+def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n_f):
     global frame
-    global frame_1_info
+    #global frame_1_info
     global frame_info
     global cur_reward
     global reward_info
 
-    #get frame 1 and 2 info
+    #update reward
+    reward_info.append(cur_reward)
+
+    #update_frame_info
+    cur_frame_info = []
     if frame == 1:
-        frame_1_info.append(ball_frect.pos[0])
-        frame_1_info.append(ball_frect.pos[1])
-        frame_1_info.append(paddle_frect.pos[0])
-        frame_1_info.append(paddle_frect.pos[1])
-        frame_1_info.append(paddle_frect.pos[1]+70)
-        frame_1_info.append(other_paddle_frect.pos[0])
-        frame_1_info.append(other_paddle_frect.pos[1])
-        frame_1_info.append(other_paddle_frect.pos[1]+70)
-
-
-    if frame == 2:
-        cur_frame_info = []
+        for i in range(n_f):
+            cur_frame_info.append(ball_frect.pos[0])
+            cur_frame_info.append(ball_frect.pos[1])
+            cur_frame_info.append(paddle_frect.pos[0])
+            cur_frame_info.append(paddle_frect.pos[1])
+            cur_frame_info.append(paddle_frect.pos[1]+70)
+            cur_frame_info.append(other_paddle_frect.pos[0])
+            cur_frame_info.append(other_paddle_frect.pos[1])
+            cur_frame_info.append(other_paddle_frect.pos[1]+70)
+        #print(len(cur_frame_info))
+        #print(cur_frame_info)
+        #print("----------")
+    else:
         cur_frame_info.append(ball_frect.pos[0])
         cur_frame_info.append(ball_frect.pos[1])
         cur_frame_info.append(paddle_frect.pos[0])
@@ -60,30 +65,13 @@ def store_frame_info(paddle_frect, other_paddle_frect, ball_frect):
         cur_frame_info.append(other_paddle_frect.pos[0])
         cur_frame_info.append(other_paddle_frect.pos[1])
         cur_frame_info.append(other_paddle_frect.pos[1]+70)
-        cur_frame_info = cur_frame_info + copy.deepcopy(frame_1_info)
-        frame_info.append(cur_frame_info)
+        cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-2][0:-8])
 
-        reward_info.append(cur_reward)
+    #print(len(cur_frame_info))
+    #print(cur_frame_info)
+    #print("----------")
+    frame_info.append(cur_frame_info)
 
-    #for each frame after frame 2
-    if frame > 2:
-        cur_frame_info = []
-        cur_frame_info.append(ball_frect.pos[0])
-        cur_frame_info.append(ball_frect.pos[1])
-        cur_frame_info.append(paddle_frect.pos[0])
-        cur_frame_info.append(paddle_frect.pos[1])
-        cur_frame_info.append(paddle_frect.pos[1]+70)
-        cur_frame_info.append(other_paddle_frect.pos[0])
-        cur_frame_info.append(other_paddle_frect.pos[1])
-        cur_frame_info.append(other_paddle_frect.pos[1]+70)
-        cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-3][8:])
-        frame_info.append(cur_frame_info)
-
-        reward_info.append(cur_reward)
-
-    #for testing
-    #if frame == 20:
-    #    print(frame_info)
     '''
     if cur_reward != 0:
         print(len(frame_info))
@@ -146,7 +134,7 @@ def forward_prop():
 
     '''
     global params
-    print(params)
+    #print(params)
     return np.random.uniform()
 
 #This is the main function
@@ -163,11 +151,13 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
 
     check_side(paddle_frect)
     update_reward(score)
-    store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-
+    #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 5)
 
 
     #end, update global variables
+    frame += 1
+    last_score = copy.deepcopy(score)
 
     if reset:
         #pass info to training
@@ -177,9 +167,6 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
         reset_round()
         reset = False
 
-
-    frame += 1
-    last_score = copy.deepcopy(score)
 
     #decision making by AI
     '''
@@ -219,10 +206,73 @@ def save_params():
 
 
 
+######################### Archived Code ########################################
+'''
+def store_frame_info(paddle_frect, other_paddle_frect, ball_frect):
+    global frame
+    global frame_1_info
+    global frame_info
+    global cur_reward
+    global reward_info
+
+    #get frame 1 and 2 info
+    if frame == 1:
+        frame_1_info.append(ball_frect.pos[0])
+        frame_1_info.append(ball_frect.pos[1])
+        frame_1_info.append(paddle_frect.pos[0])
+        frame_1_info.append(paddle_frect.pos[1])
+        frame_1_info.append(paddle_frect.pos[1]+70)
+        frame_1_info.append(other_paddle_frect.pos[0])
+        frame_1_info.append(other_paddle_frect.pos[1])
+        frame_1_info.append(other_paddle_frect.pos[1]+70)
 
 
+    if frame == 2:
+        cur_frame_info = []
+        cur_frame_info.append(ball_frect.pos[0])
+        cur_frame_info.append(ball_frect.pos[1])
+        cur_frame_info.append(paddle_frect.pos[0])
+        cur_frame_info.append(paddle_frect.pos[1])
+        cur_frame_info.append(paddle_frect.pos[1]+70)
+        cur_frame_info.append(other_paddle_frect.pos[0])
+        cur_frame_info.append(other_paddle_frect.pos[1])
+        cur_frame_info.append(other_paddle_frect.pos[1]+70)
+        cur_frame_info = cur_frame_info + copy.deepcopy(frame_1_info)
+        frame_info.append(cur_frame_info)
+
+        reward_info.append(cur_reward)
+
+    #for each frame after frame 2
+    if frame > 2:
+        cur_frame_info = []
+        cur_frame_info.append(ball_frect.pos[0])
+        cur_frame_info.append(ball_frect.pos[1])
+        cur_frame_info.append(paddle_frect.pos[0])
+        cur_frame_info.append(paddle_frect.pos[1])
+        cur_frame_info.append(paddle_frect.pos[1]+70)
+        cur_frame_info.append(other_paddle_frect.pos[0])
+        cur_frame_info.append(other_paddle_frect.pos[1])
+        cur_frame_info.append(other_paddle_frect.pos[1]+70)
+        cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-3][0:8])
+        frame_info.append(cur_frame_info)
+
+        reward_info.append(cur_reward)
+
+    #for testing
+    #if frame == 20:
+    #    print(frame_info)
+    '''
+    if cur_reward != 0:
+        print(len(frame_info))
+        print(len(reward_info))
+        print(reward_info)
+        print("------------------------")
+    '''
+
+    return
 
 
+'''
 
 
 

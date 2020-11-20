@@ -8,7 +8,6 @@ import numpy as np
 
 
 
-
 def train_bot(Xtrain, Ytrain, params):
     '''
     To be completed: implement forward prop and backward prop to train the params
