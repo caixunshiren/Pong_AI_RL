@@ -152,7 +152,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     check_side(paddle_frect)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 5)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 75)
 
 
     #end, update global variables
@@ -199,8 +199,13 @@ def save_params():
     with open('params.txt', 'w') as f:
         f.write(json.dumps(params))
 
-
-
+def save_training_sets():
+    global Xtrain
+    global Ytrain
+    with open('Xtrain.txt', 'w') as f:
+        f.write(json.dumps(Xtrain))
+    with open('Ytrain.txt', 'w') as f:
+        f.write(json.dumps(Ytrain))
 
 
 
@@ -261,13 +266,12 @@ def store_frame_info(paddle_frect, other_paddle_frect, ball_frect):
     #for testing
     #if frame == 20:
     #    print(frame_info)
-    '''
+
     if cur_reward != 0:
         print(len(frame_info))
         print(len(reward_info))
         print(reward_info)
         print("------------------------")
-    '''
 
     return
 

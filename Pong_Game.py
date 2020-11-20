@@ -405,6 +405,7 @@ def init_game(last_round = False):
 
     #Training starts here:
     RLbot.train()
+    RLbot.save_training_sets()
 
     if last_round:
         RLbot.save_params()
@@ -415,7 +416,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 2
+    training_episode= 1
     for i in range(training_episode-1):
         init_game()
     init_game(True)
