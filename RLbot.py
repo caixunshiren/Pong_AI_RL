@@ -29,9 +29,10 @@ reward_info = []
 #training
 Xtrain = []
 Ytrain = []
+Rtrain = []
 params= ["no param rn", "noooooo!"]
 
-def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n_f):
+def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n_f, table_size):
     global frame
     #global frame_1_info
     global frame_info
@@ -45,26 +46,26 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
     cur_frame_info = []
     if frame == 1:
         for i in range(n_f):
-            cur_frame_info.append(ball_frect.pos[0])
-            cur_frame_info.append(ball_frect.pos[1])
-            cur_frame_info.append(paddle_frect.pos[0])
-            cur_frame_info.append(paddle_frect.pos[1])
-            cur_frame_info.append(paddle_frect.pos[1]+70)
-            cur_frame_info.append(other_paddle_frect.pos[0])
-            cur_frame_info.append(other_paddle_frect.pos[1])
-            cur_frame_info.append(other_paddle_frect.pos[1]+70)
+            cur_frame_info.append(ball_frect.pos[0] / table_size[0] - 0.5)
+            cur_frame_info.append(ball_frect.pos[1] / table_size[1] - 0.5)
+            cur_frame_info.append(paddle_frect.pos[0] / table_size[0] - 0.5)
+            cur_frame_info.append(paddle_frect.pos[1] / table_size[1] - 0.5)
+            cur_frame_info.append((paddle_frect.pos[1]+70) / table_size[1] - 0.5)
+            cur_frame_info.append(other_paddle_frect.pos[0] / table_size[0] - 0.5)
+            cur_frame_info.append(other_paddle_frect.pos[1] / table_size[1] - 0.5)
+            cur_frame_info.append((other_paddle_frect.pos[1]+70) / table_size[1] - 0.5)
         #print(len(cur_frame_info))
         #print(cur_frame_info)
         #print("----------")
     else:
-        cur_frame_info.append(ball_frect.pos[0])
-        cur_frame_info.append(ball_frect.pos[1])
-        cur_frame_info.append(paddle_frect.pos[0])
-        cur_frame_info.append(paddle_frect.pos[1])
-        cur_frame_info.append(paddle_frect.pos[1]+70)
-        cur_frame_info.append(other_paddle_frect.pos[0])
-        cur_frame_info.append(other_paddle_frect.pos[1])
-        cur_frame_info.append(other_paddle_frect.pos[1]+70)
+        cur_frame_info.append(ball_frect.pos[0] / table_size[0] - 0.5)
+        cur_frame_info.append(ball_frect.pos[1] / table_size[1] - 0.5)
+        cur_frame_info.append(paddle_frect.pos[0] / table_size[0] - 0.5)
+        cur_frame_info.append(paddle_frect.pos[1] / table_size[1] - 0.5)
+        cur_frame_info.append((paddle_frect.pos[1]+70) / table_size[1] - 0.5)
+        cur_frame_info.append(other_paddle_frect.pos[0] / table_size[0] - 0.5)
+        cur_frame_info.append(other_paddle_frect.pos[1] / table_size[1] - 0.5)
+        cur_frame_info.append((other_paddle_frect.pos[1]+70) / table_size[1] - 0.5)
         cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-2][0:-8])
 
     #print(len(cur_frame_info))
@@ -146,13 +147,14 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     global reward_info
     global Xtrain
     global Ytrain
+    global Rtrain
 
     #print(score, last_score)
 
     check_side(paddle_frect)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 75)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 75, table_size)
 
 
     #end, update global variables
@@ -162,7 +164,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     if reset:
         #pass info to training
         Xtrain.append(frame_info)
-        Ytrain.append(reward_info)
+        Rtrain.append(reward_info)
         #reset
         reset_round()
         reset = False
@@ -176,7 +178,11 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
      return "up"
     '''
     action_prob = forward_prop()
-    return'down' if np.random.uniform() < action_prob else 'up'
+    ret = 'down' if np.random.uniform() < action_prob else 'up'
+    y = 1 if ret == 'up' else 0
+    Ytrain.append(y)
+    #print(y, ret)
+    return ret
 
 
 
@@ -191,8 +197,9 @@ import bot_trainer as bt
 def train():
     global Xtrain
     global Ytrain
+    global Rtrain
     global params
-    params = bt.train_bot(Xtrain, Ytrain, params)
+    params = bt.train_bot(Xtrain, Ytrain, Rtrain, params)
 
 def save_params():
     global params
@@ -202,10 +209,13 @@ def save_params():
 def save_training_sets():
     global Xtrain
     global Ytrain
+    global Rtrain
     with open('Xtrain.txt', 'w') as f:
         f.write(json.dumps(Xtrain))
     with open('Ytrain.txt', 'w') as f:
         f.write(json.dumps(Ytrain))
+    with open('Rtrain.txt', 'w') as f:
+        f.write(json.dumps(Rtrain))
 
 
 

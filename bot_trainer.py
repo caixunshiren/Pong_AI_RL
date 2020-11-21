@@ -1,40 +1,41 @@
 import numpy as np
+import tensorflow as tf
 
 
 
-
-def convert_advantage_factor(Ytrain, gamma):
-    Ytrain_modified = []
-    for round in Ytrain:
+def convert_advantage_factor(Rtrain, gamma):
+    Rtrain_modified = []
+    for round in Rtrain:
         for i in range(0, len(round)):
             round[i] = gamma**(len(round)-i)
-        Ytrain_modified.append(round)
+        Rtrain_modified.append(round)
+    #Optional: normalize the reward
 
-    return Ytrain_modified
+    return Rtrain_modified
 
-def concat_training_set(Xtrain, Ytrain):
-    '''
-    TBC
-    '''
-    print(len(Xtrain))
-    print(len(Xtrain[0]))
-    print(len(Xtrain[0][0]))
+def concat_training_set(Xtrain, Ytrain, Rtrain):
 
-    print(len(Ytrain))
-    print(len(Ytrain[0]))
+    X = []
+    R = []
 
-    X = np.array(Xtrain)
-    Y = np.array(Ytrain)
+    for round_x, round_r in zip(Xtrain, Rtrain):
+        X = X + round_x
+        R = R+round_r
+
+    X = np.array(X)
+    Y = np.array([Ytrain]).T
+    R = np.array([R]).T
     print(X.shape)
     print(Y.shape)
-    type(X)
+    print(R.shape)
+    print(X)
+    print(Y)
+    print(R)
 
-    return Xtrain, Ytrain
+    return X, Y, R
 
-def normalization():
-    pass
 
-def train_bot(Xtrain, Ytrain, params):
+def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
     To be completed: implement forward prop and backward prop to train the params
 
@@ -44,14 +45,43 @@ def train_bot(Xtrain, Ytrain, params):
 
     '''
     NN structure:
-        600 features ----> 100 nets ----> 20 nets ----> sigmoid P for up
+        600 features ----> 200 nets ----> sigmoid P for up
     '''
 
     #hyperparameters
     gamma = 0.99
+    learning_rate = 0.01
+
 
     #Data Processing
-    Ytrain = convert_advantage_factor(Ytrain, gamma)
-    Xtrain, Ytrain = concat_training_set(Xtrain, Ytrain)
+    Rtrain = convert_advantage_factor(Rtrain, gamma)
+    Xtrain, Rtrain = concat_training_set(Xtrain, Ytrain, Rtrain)
 
     return params
+
+
+
+
+
+
+
+
+
+
+
+############ Archived ############
+def normalization(X):
+    '''
+    Don't need it. Normalize in RLbot when collecting data
+
+    norm_X = np.zeros(X.shape)
+    #print(norm_X.shape)
+
+    return norm_X
+    '''
+    pass
+
+
+
+
+
