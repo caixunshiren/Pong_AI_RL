@@ -30,7 +30,6 @@ reward_info = []
 Xtrain = []
 Ytrain = []
 Rtrain = []
-params= ["no param rn", "noooooo!"]
 
 def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n_f, table_size):
     global frame
@@ -128,15 +127,17 @@ def reset_round():
     frame_info = []
     reward_info = []
 
-def forward_prop():
-    '''
-    To be completed: implement forward prop based on the params
+def sigmoid(x):
+  return 1.0 / (1.0 + np.exp(-x))
 
-
-    '''
+def forward_prop(x):
     global params
-    #print(params)
-    return np.random.uniform()
+    x = np.array([x]).T
+    h = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
+    h[h<0] = 0 # ReLU introduces non-linearity
+    logp = np.dot(params['W2'], h) + params['b2']# This is a logits function and outputs a decimal.   (1 x H) . (H x 1) = 1 (scalar)
+    p = sigmoid(logp)  # squashes output to  between 0 & 1 range
+    return p
 
 #This is the main function
 def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []):
@@ -157,6 +158,21 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 75, table_size)
 
 
+
+
+
+    #decision making by AI
+    '''
+    if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
+     return "down"
+    else:
+     return "up"
+    '''
+    action_prob = forward_prop(frame_info[-1])
+    ret = 'down' if np.random.uniform() < action_prob else 'up'
+    y = 1 if ret == 'up' else 0
+    Ytrain.append(y)
+
     #end, update global variables
     frame += 1
     last_score = copy.deepcopy(score)
@@ -169,19 +185,6 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
         reset_round()
         reset = False
 
-
-    #decision making by AI
-    '''
-    if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
-     return "down"
-    else:
-     return "up"
-    '''
-    action_prob = forward_prop()
-    ret = 'down' if np.random.uniform() < action_prob else 'up'
-    y = 1 if ret == 'up' else 0
-    Ytrain.append(y)
-    #print(y, ret)
     return ret
 
 
@@ -199,12 +202,24 @@ def train():
     global Ytrain
     global Rtrain
     global params
+    print("---------------------------")
+    print("Training Data Collected!")
     params = bt.train_bot(Xtrain, Ytrain, Rtrain, params)
+    print("Parameters Updated Successfully!")
 
 def save_params():
     global params
-    with open('params.txt', 'w') as f:
+    for key in params:
+        params[key] = params[key].tolist()
+        #print(type(params[key]))
+        #print(params[key])
+
+    filename = 'params.txt'
+
+    with open(filename, 'w') as f:
         f.write(json.dumps(params))
+
+    print("Parameters Saved!", filename)
 
 def save_training_sets():
     global Xtrain
@@ -219,7 +234,24 @@ def save_training_sets():
 
 
 
+########### The Weights ############
 
+H = 200
+D = 600
+
+params = {}
+params['W1'] = np.random.randn(H,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
+params['W2'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
+params['b1'] = np.zeros((H,1))
+params['b2'] = np.zeros((1,1))
+
+init_params = copy.deepcopy(params)
+
+for key in params:
+    init_params[key] = init_params[key].tolist()
+
+with open('initial_params.txt', 'w') as f:
+    f.write(json.dumps(init_params))
 
 ######################### Archived Code ########################################
 '''

@@ -359,6 +359,9 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
     # return
 
 def init_game(last_round = False):
+
+    print("Collecting Training Data %&%")
+
     table_size = (440, 280)
     paddle_size = (10, 70)
     ball_size = (15, 15)
@@ -418,8 +421,17 @@ if __name__ == '__main__':
     pygame.init()
     training_episode= 1
     for i in range(training_episode-1):
+        print("##############################")
+        print("Episode",i+1,"Training Start")
         init_game()
+        print("Episode",i+1,"Training Ended")
+        print("##############################")
+
+    print("##############################")
+    print("Episode",training_episode,"Training Start")
     init_game(True)
+    print("Episode",i+1,"Training Ended")
+    print("##############################")
     pygame.quit()
 
 

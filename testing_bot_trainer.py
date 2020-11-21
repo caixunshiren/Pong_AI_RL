@@ -21,7 +21,9 @@ if __name__ == '__main__':
 
    # print(Ytrain)
 
-    Rtrain = bt.convert_advantage_factor(Rtrain, 0.99)
-    X, Y, R = bt.concat_training_set(Xtrain, Ytrain, Rtrain)
+    #Rtrain = bt.convert_advantage_factor(Rtrain, 0.99)
+    #X, Y, R = bt.concat_training_set(Xtrain, Ytrain, Rtrain)
 
     #X = bt.normalization(X)
+    params = []
+    params = bt.train_bot(Xtrain, Ytrain, Rtrain, params)
