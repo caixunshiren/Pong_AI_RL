@@ -293,7 +293,7 @@ def check_point(score, ball, table_size):
     return (ball, score)
 
 
-def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display):
+def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep):
     score = [0, 0]
 
 
@@ -328,7 +328,7 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
             clock.tick(turn_wait_rate)
 
 
-
+        #if ep == -1 or ep % 20 == 0:
         render(screen, paddles, ball, score, table_size)
 
 
@@ -358,7 +358,7 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
     #print(score)
     # return
 
-def init_game(last_round = False):
+def init_game(last_round = False, ep = -1):
 
     print("Collecting Training Data %&%")
 
@@ -375,7 +375,7 @@ def init_game(last_round = False):
     timeout = 0.0003
     clock_rate = 80
     turn_wait_rate = 3
-    score_to_win = 10
+    score_to_win = 5
 
 
     screen = pygame.display.set_mode(table_size)
@@ -385,14 +385,14 @@ def init_game(last_round = False):
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-
-
-
+    display = 0
+    if ep == -1 or ep % 50 == 0:
+        display = 1
 
     paddles[0].move_getter = RLbot.pongbot
     paddles[1].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
 
-    game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
+    game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
     screen.blit(pygame.font.Font(None, 32).render(str('SWITCHING SIDES'), True, white), [int(0.6*table_size[0])-8, 0])
 
@@ -404,13 +404,13 @@ def init_game(last_round = False):
 
 
 
-    game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
+    game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
 
     #Training starts here:
     RLbot.train()
-    RLbot.save_training_sets()
+    #RLbot.save_training_sets()
 
-    if last_round:
+    if last_round or ep % 50 == 0:
         RLbot.save_params()
 
 
@@ -419,21 +419,22 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 20
+    training_episode= 2500
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
-        init_game()
+        init_game(False, i)
         print("Episode",i+1,"Training Ended")
         print("##############################")
 
     print("##############################")
     print("Episode",training_episode,"Training Start")
     init_game(True)
-    print("Episode",i+1,"Training Ended")
+    print("Episode",training_episode,"Training Ended")
     print("##############################")
     pygame.quit()
 
+    #RLbot.save_params()
 
 
 
