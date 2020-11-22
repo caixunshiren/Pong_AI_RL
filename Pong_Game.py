@@ -375,7 +375,7 @@ def init_game(last_round = False):
     timeout = 0.0003
     clock_rate = 80
     turn_wait_rate = 3
-    score_to_win = 5
+    score_to_win = 10
 
 
     screen = pygame.display.set_mode(table_size)
@@ -419,7 +419,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 1
+    training_episode= 20
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")

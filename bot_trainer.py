@@ -1,6 +1,8 @@
 import numpy as np
-import tensorflow as tf
-
+import tensorflow.compat.v1 as tf
+import math
+#from tensorflow.python.framework import ops
+tf.compat.v1.disable_eager_execution()
 
 
 def convert_advantage_factor(Rtrain, gamma):
@@ -25,7 +27,7 @@ def concat_training_set(Xtrain, Ytrain, Rtrain):
     X = np.array(X).T
     Y = np.array([Ytrain])
     R = np.array([R])
-    print("1. Checking Shapes:")
+    print("1. Checking Input Shapes:")
     print("X:",X.shape)
     print("Y:",Y.shape)
     print("R:",R.shape)
@@ -39,24 +41,38 @@ def concat_training_set(Xtrain, Ytrain, Rtrain):
 
 def placeholders(num_features):
 
-    A_0 = tf.placeholder(dtype = tf.float64, shape = ([num_features,None]))
+    A_0 = tf.placeholder(dtype = tf.float64, shape = ([num_features,None]), name = 'A_0')
 
-    Y = tf.placeholder(dtype = tf.float64, shape = ([1,None]))
+    label = tf.placeholder(dtype = tf.float64, shape = ([1,None]), name = 'label')
 
-    R = tf.placeholder(dtype = tf.float64, shape = ([1,None]))
+    reward = tf.placeholder(dtype = tf.float64, shape = ([1,None]), name = 'reward')
 
-    return A_0,Y,R
+    return A_0,label,reward
 
 def initialiseParameters(params):
 
-    W1 = tf.Variable(initial_value=tf.convert_to_tensor(params['W1'], np.float32), dtype=tf.float64)
+    W1 = tf.Variable(initial_value=tf.convert_to_tensor(params['W1'], np.float64), dtype=tf.float64, name = 'W1')
 
-    b1 = tf.Variable(initial_value=tf.convert_to_tensor(params['b1'], np.float32), dtype=tf.float64)
+    b1 = tf.Variable(initial_value=tf.convert_to_tensor(params['b1'], np.float64), dtype=tf.float64, name = 'b1')
 
-    W2 = tf.Variable(initial_value=tf.convert_to_tensor(params['W2'], np.float32), dtype=tf.float64)
+    W2 = tf.Variable(initial_value=tf.convert_to_tensor(params['W2'], np.float64), dtype=tf.float64, name = 'W2')
 
-    b2 = tf.Variable(initial_value=tf.convert_to_tensor(params['b2'], np.float32), dtype=tf.float64)
+    b2 = tf.Variable(initial_value=tf.convert_to_tensor(params['b2'], np.float64), dtype=tf.float64, name = 'b1')
 
+    print("2. Checking Parameter Shapes:")
+    print({"W1":W1,"b1":b1,"W2":W2,"b2":b2})
+    print("  ")
+    print("  ")
+    '''
+
+    W1 = tf.Variable(initial_value=tf.random_normal([200,600], dtype = tf.float64) * 0.01)
+
+    b1 = tf.Variable(initial_value=tf.zeros([200,1], dtype=tf.float64))
+
+    W2 = tf.Variable(initial_value=tf.random_normal([1,200], dtype=tf.float64) * 0.01)
+
+    b2 = tf.Variable(initial_value=tf.zeros([1,1], dtype=tf.float64))
+    '''
     return {"W1":W1,"b1":b1,"W2":W2,"b2":b2}
 
 def forward_propagation(A_0,parameters):
@@ -69,13 +85,15 @@ def forward_propagation(A_0,parameters):
 
     A2 = tf.sigmoid(Z2) # 1 * m
 
+    #A2 = Z2
+
     return Z2
 
-def loss(logit, label, reward):
-    entr = label * tf.log(logit) + (1-label) * tf.log(1-logit)
-    return tf.reduce_sum(reward * entr)
+def loss(logit, label, reward, m):
+    entr = label * -tf.log(logit) + (1-label) * -tf.log(1-logit)
+    return -tf.reduce_sum(reward * entr)
 
-def random_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
+def compute_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
     """
     Creates a list of random minibatches from (X, Y)
 
@@ -91,10 +109,6 @@ def random_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
 
     m = X.shape[1]                  # number of training examples
     mini_batches = []
-
-
-
-
     num_complete_minibatches = math.floor(m/mini_batch_size) # number of mini batches of size mini_batch_size in your partitionning
     for k in range(0, num_complete_minibatches):
         mini_batch_X = X[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
@@ -114,7 +128,7 @@ def random_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
     return mini_batches
 
 def shallow_model(X,Y,R, params, learning_rate, num_epochs = 1500, minibatch_size = 32, print_cost = True):
-
+    #ops.reset_default_graph()
     (n_x, m) = X.shape                          # (n_x: input size, m : number of examples in the train set)
     n_y = Y.shape[0]
 
@@ -126,21 +140,22 @@ def shallow_model(X,Y,R, params, learning_rate, num_epochs = 1500, minibatch_siz
 
     A2 = forward_propagation(A_0, parameters)
 
-    cost = loss(A2, label, reward)
-
+    cost = loss(A2, label, reward, m)
+    #cost = -1*tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=A2,labels=label))
     #train_net = tf.train.GradientDescentOptimizer(learning_rate).maximize(cost)
 
+    optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).minimize(cost)
+
     init = tf.global_variables_initializer()
-
-    optimizer = tf.train.AdamOptimizer(learning_rate = learning_rate).maximize(cost)
-
+    #print("1")
     with tf.Session() as sess:
 
         sess.run(init)
 
+        #print("2")
         # Do the training loop
         for epoch in range(num_epochs):
-
+            #print("3")
             epoch_cost = 0.                       # Defines a cost related to an epoch
             num_minibatches = int(m / minibatch_size) # number of minibatches of size minibatch_size in the train set
             #seed = seed + 1
@@ -153,11 +168,11 @@ def shallow_model(X,Y,R, params, learning_rate, num_epochs = 1500, minibatch_siz
 
 
                 _ , minibatch_cost = sess.run([optimizer, cost], feed_dict={A_0: minibatch_X, label: minibatch_Y, reward: minibatch_R})
-
+                #print("running")
                 epoch_cost += minibatch_cost / minibatch_size
 
             # Print the cost every epoch
-            if print_cost == True and epoch % 100 == 0:
+            if print_cost == True and epoch % 5 == 0:
                 print ("Cost after epoch %i: %f" % (epoch, epoch_cost))
 
 
@@ -189,8 +204,17 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     X, Y, R = concat_training_set(Xtrain, Ytrain, Rtrain)
 
     #Placeholder
+    #print(params)
 
+    params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 10, minibatch_size = 32, print_cost = True)
 
+    #print(params)
+    '''
+    for key in params:
+        params[key] = params[key].numpy()
+        print(type(params[key]))
+        print(params[key])
+    '''
     print("*       *       *")
     print("Policy Training End")
     print("---------------------------")
@@ -219,7 +243,45 @@ def normalization(X):
     '''
     pass
 
+############
+import json
+
+def  test():
+    Xtrain = []
+    Ytrain = []
+    Rtrain = []
+    with open('Xtrain.txt') as f:
+        Xtrain = json.load(f)
+    with open('Ytrain.txt') as f:
+        Ytrain = json.load(f)
+    with open('Rtrain.txt') as f:
+        Rtrain = json.load(f)
 
 
+    #print(Ytrain)
+    #print(Xtrain[1])
+    #Y = np.array(Ytrain)
+    #print(Y)
+    #print(Y.shape)
+
+   # print(Ytrain)
+
+    #Rtrain = bt.convert_advantage_factor(Rtrain, 0.99)
+    #X, Y, R = bt.concat_training_set(Xtrain, Ytrain, Rtrain)
+
+    #X = bt.normalization(X)
+    H = 200
+    D = 600
+
+    params = {}
+    params['W1'] = np.random.randn(H,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
+    params['W2'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
+    params['b1'] = np.zeros((H,1))
+    params['b2'] = np.zeros((1,1))
+
+    #print(params)
+
+    params = train_bot(Xtrain, Ytrain, Rtrain, params)
 
 
+#test()

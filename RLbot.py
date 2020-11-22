@@ -239,20 +239,31 @@ def save_training_sets():
 H = 200
 D = 600
 
+mode = 'new'
 params = {}
-params['W1'] = np.random.randn(H,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
-params['W2'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
-params['b1'] = np.zeros((H,1))
-params['b2'] = np.zeros((1,1))
 
-init_params = copy.deepcopy(params)
+if mode == 'new':
 
-for key in params:
-    init_params[key] = init_params[key].tolist()
+    params['W1'] = np.random.randn(H,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
+    params['W2'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
+    params['b1'] = np.zeros((H,1))
+    params['b2'] = np.zeros((1,1))
 
-with open('initial_params.txt', 'w') as f:
-    f.write(json.dumps(init_params))
+    init_params = copy.deepcopy(params)
 
+    for key in params:
+        init_params[key] = init_params[key].tolist()
+
+    with open('initial_params.txt', 'w') as f:
+        f.write(json.dumps(init_params))
+
+elif mode == 'load':
+
+    with open('params_2.txt', 'r') as f:
+        params = json.load(f)
+
+    for key in params:
+        params[key] = np.array(params[key])
 ######################### Archived Code ########################################
 '''
 def store_frame_info(paddle_frect, other_paddle_frect, ball_frect):
