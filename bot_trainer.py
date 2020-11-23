@@ -172,7 +172,7 @@ def shallow_model(X,Y,R, params, learning_rate, num_epochs = 1500, minibatch_siz
                 epoch_cost += minibatch_cost / minibatch_size
 
             # Print the cost every epoch
-            if print_cost == True and epoch % 5 == 0:
+            if print_cost == True:
                 print ("Cost after epoch %i: %f" % (epoch, epoch_cost))
 
 
@@ -192,11 +192,11 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     print("*       *       *")
     '''
     NN structure:
-        600 features ----> 200 nets ----> sigmoid calculates P(up)
+        800 features ----> 400 nets ----> sigmoid calculates P(up)
     '''
 
     #hyperparameters
-    gamma = 0.99
+    gamma = 0.98
     learning_rate = 0.01
 
     #Data Processing
@@ -206,7 +206,7 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     #Placeholder
     #print(params)
 
-    params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 10, minibatch_size = 32, print_cost = True)
+    params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 1, minibatch_size = 32, print_cost = True)
 
     #print(params)
     '''

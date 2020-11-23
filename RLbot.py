@@ -113,6 +113,8 @@ def update_reward(score):
             cur_reward = score[0] - last_score[0] + last_score[1] - score[1]
         else:
             cur_reward = score[1] - last_score[1] + last_score[0] - score[0]
+    if cur_reward < 0:
+        cur_reward * 0.75
 
 def reset_round():
     global frame
@@ -155,7 +157,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     check_side(paddle_frect)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 75, table_size)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 100, table_size)
 
 
 
@@ -205,6 +207,9 @@ def train():
     print("---------------------------")
     print("Training Data Collected!")
     params = bt.train_bot(Xtrain, Ytrain, Rtrain, params)
+    Xtrain = []
+    Ytrain = []
+    Rtrain = []
     print("Parameters Updated Successfully!")
 
 def save_params():
@@ -214,7 +219,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params.txt'
+    filename = 'paramsV2.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -236,8 +241,8 @@ def save_training_sets():
 
 ########### The Weights ############
 
-H = 200
-D = 600
+H = 400
+D = 800
 
 mode = 'new'
 params = {}
@@ -259,7 +264,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params_2.txt', 'r') as f:
+    with open('paramsV2.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:
