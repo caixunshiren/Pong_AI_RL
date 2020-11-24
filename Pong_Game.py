@@ -25,9 +25,10 @@ from pygame.locals import *
 import math
 
 import chaser_ai
-import bot1_v1
+
 import RLbot
 
+import bot1_v1
 
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -303,6 +304,7 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
     while max(score) < score_to_win:
         old_score = score[:]
         ball, score = check_point(score, ball, table_size)
+
         paddles[0].move(paddles[1].frect, ball.frect, table_size, score)
         paddles[1].move(paddles[0].frect, ball.frect, table_size, score)
 
@@ -344,8 +346,10 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
 
     font = pygame.font.Font(None, 64)
     if score[0] > score[1]:
+        print("Score:",score)
         screen.blit(font.render("Left wins!", True, white, black), [24, 32])
     else:
+        print("Score:",score)
         screen.blit(font.render("Right wins!", True, white, black), [24, 32])
     pygame.display.flip()
     clock.tick(2)
@@ -377,6 +381,7 @@ def init_game(last_round = False, ep = -1):
     turn_wait_rate = 3
     score_to_win = 5
 
+    bot1_v1.reinit()
 
     screen = pygame.display.set_mode(table_size)
     pygame.display.set_caption('PongAIvAI')
@@ -386,11 +391,12 @@ def init_game(last_round = False, ep = -1):
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     display = 0
-    if ep == -1 or ep % 50 == 0:
+    if ep == -1 or ep % 1000 == 0:
         display = 1
 
     paddles[0].move_getter = RLbot.pongbot
     paddles[1].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
+
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
@@ -410,7 +416,7 @@ def init_game(last_round = False, ep = -1):
     RLbot.train()
     #RLbot.save_training_sets()
 
-    if last_round or ep % 50 == 0:
+    if last_round or ep % 1000 == 0:
         RLbot.save_params()
 
 
@@ -419,7 +425,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 2500
+    training_episode= 10000
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
@@ -437,13 +443,14 @@ if __name__ == '__main__':
     #RLbot.save_params()
 
 
+######### Log ##########
+'''
+Nov 22: ParamV2 trained 150 + 550 + 50 + 50 + 50 = 850 episodes
+Nov 23: ParamV2 trained 100 + 500 + 100 + 100 + 100 + 700 + 2500
 
+Nov 23 - 24:     Paramv4 trained 2000 + 1000 + 10000
 
-
-
-
-
-
+'''
 
 
 

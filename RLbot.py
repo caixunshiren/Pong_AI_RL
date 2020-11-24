@@ -113,8 +113,8 @@ def update_reward(score):
             cur_reward = score[0] - last_score[0] + last_score[1] - score[1]
         else:
             cur_reward = score[1] - last_score[1] + last_score[0] - score[0]
-    if cur_reward < 0:
-        cur_reward * 0.75
+    #if cur_reward < 0:
+    #    cur_reward * 0.75
 
 def reset_round():
     global frame
@@ -171,7 +171,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
      return "up"
     '''
     action_prob = forward_prop(frame_info[-1])
-    ret = 'down' if np.random.uniform() < action_prob else 'up'
+    ret = 'up' if np.random.uniform() < action_prob else 'down'
     y = 1 if ret == 'up' else 0
     Ytrain.append(y)
 
@@ -219,7 +219,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'paramsV2.txt'
+    filename = 'paramsV4.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -244,7 +244,7 @@ def save_training_sets():
 H = 400
 D = 800
 
-mode = 'new'
+mode = 'load'
 params = {}
 
 if mode == 'new':
@@ -264,7 +264,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('paramsV2.txt', 'r') as f:
+    with open('paramsV4.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:

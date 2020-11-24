@@ -57,7 +57,7 @@ def initialiseParameters(params):
 
     W2 = tf.Variable(initial_value=tf.convert_to_tensor(params['W2'], np.float64), dtype=tf.float64, name = 'W2')
 
-    b2 = tf.Variable(initial_value=tf.convert_to_tensor(params['b2'], np.float64), dtype=tf.float64, name = 'b1')
+    b2 = tf.Variable(initial_value=tf.convert_to_tensor(params['b2'], np.float64), dtype=tf.float64, name = 'b2')
 
     print("2. Checking Parameter Shapes:")
     print({"W1":W1,"b1":b1,"W2":W2,"b2":b2})
@@ -179,6 +179,9 @@ def shallow_model(X,Y,R, params, learning_rate, num_epochs = 1500, minibatch_siz
 
         # lets save the parameters in a variable
         parameters = sess.run(parameters)
+
+        #sess.reset()
+
         print ("Parameters have been trained!")
         return parameters
 
@@ -196,8 +199,8 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
 
     #hyperparameters
-    gamma = 0.98
-    learning_rate = 0.01
+    gamma = 0.985
+    learning_rate = 0.001
 
     #Data Processing
     Rtrain = convert_advantage_factor(Rtrain, gamma)
@@ -207,7 +210,7 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     #print(params)
 
     params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 1, minibatch_size = 32, print_cost = True)
-
+    tf.reset_default_graph()
     #print(params)
     '''
     for key in params:
