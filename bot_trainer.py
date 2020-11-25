@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow.compat.v1 as tf
+#import tensorflow as tf
 import math
 #from tensorflow.python.framework import ops
 tf.compat.v1.disable_eager_execution()
@@ -59,8 +60,12 @@ def initialiseParameters(params):
 
     b2 = tf.Variable(initial_value=tf.convert_to_tensor(params['b2'], np.float64), dtype=tf.float64, name = 'b2')
 
+    W3 = tf.Variable(initial_value=tf.convert_to_tensor(params['W3'], np.float64), dtype=tf.float64, name = 'W3')
+
+    b3 = tf.Variable(initial_value=tf.convert_to_tensor(params['b3'], np.float64), dtype=tf.float64, name = 'b3')
+
     print("2. Checking Parameter Shapes:")
-    print({"W1":W1,"b1":b1,"W2":W2,"b2":b2})
+    print({"W1":W1,"b1":b1,"W2":W2,"b2":b2, "W3":W3,"b3":b3})
     print("  ")
     print("  ")
     '''
@@ -73,7 +78,7 @@ def initialiseParameters(params):
 
     b2 = tf.Variable(initial_value=tf.zeros([1,1], dtype=tf.float64))
     '''
-    return {"W1":W1,"b1":b1,"W2":W2,"b2":b2}
+    return {"W1":W1,"b1":b1,"W2":W2,"b2":b2, "W3":W3,"b3":b3}
 
 def forward_propagation(A_0,parameters):
 
@@ -83,7 +88,11 @@ def forward_propagation(A_0,parameters):
 
     Z2 = tf.matmul(parameters["W2"],A1) + parameters["b2"]
 
-    A2 = tf.sigmoid(Z2) # 1 * m
+    A2 = tf.nn.relu(Z2)
+
+    Z3 = tf.matmul(parameters["W3"],A2) + parameters["b3"]
+
+    A3 = tf.sigmoid(Z3) # 1 * m
 
     #A2 = Z2
 
@@ -199,8 +208,8 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
 
     #hyperparameters
-    gamma = 0.985
-    learning_rate = 0.001
+    gamma = 0.99
+    learning_rate = 0.003
 
     #Data Processing
     Rtrain = convert_advantage_factor(Rtrain, gamma)

@@ -445,10 +445,7 @@ if __name__ == '__main__':
 
 ######### Log ##########
 '''
-Nov 22: ParamV2 trained 150 + 550 + 50 + 50 + 50 = 850 episodes
-Nov 23: ParamV2 trained 100 + 500 + 100 + 100 + 100 + 700 + 2500
 
-Nov 23 - 24:     Paramv4 trained 2000 + 1000 + 10000
 
 '''
 

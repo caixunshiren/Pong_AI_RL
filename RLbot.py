@@ -135,11 +135,15 @@ def sigmoid(x):
 def forward_prop(x):
     global params
     x = np.array([x]).T
-    h = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
-    h[h<0] = 0 # ReLU introduces non-linearity
-    logp = np.dot(params['W2'], h) + params['b2']# This is a logits function and outputs a decimal.   (1 x H) . (H x 1) = 1 (scalar)
-    p = sigmoid(logp)  # squashes output to  between 0 & 1 range
-    return p
+    A1 = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
+    A1[A1<0] = 0 # ReLU introduces non-linearity
+
+    A2 = np.dot(params['W2'], A1) + params['b2'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
+    A2[A2<0] = 0 # ReLU introduces non-linearity
+
+    A3 = np.dot(params['W3'], A2) + params['b3']# This is a logits function and outputs a decimal.   (1 x H) . (H x 1) = 1 (scalar)
+    A3 = sigmoid(A3)  # squashes output to  between 0 & 1 range
+    return A3
 
 #This is the main function
 def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []):
@@ -219,7 +223,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'paramsV4.txt'
+    filename = 'params2l.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -241,18 +245,21 @@ def save_training_sets():
 
 ########### The Weights ############
 
-H = 400
+H1 = 200
+H2 = 20
 D = 800
 
-mode = 'load'
+mode = 'new'
 params = {}
 
 if mode == 'new':
 
-    params['W1'] = np.random.randn(H,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
-    params['W2'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
-    params['b1'] = np.zeros((H,1))
-    params['b2'] = np.zeros((1,1))
+    params['W1'] = np.random.randn(H1,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
+    params['W2'] = np.random.randn(H2,H1) / np.sqrt(H1) # Shape will be H
+    params['W3'] = np.random.randn(1,H2) / np.sqrt(H2)
+    params['b1'] = np.zeros((H1,1))
+    params['b2'] = np.zeros((H2,1))
+    params['b3'] = np.zeros((1,1))
 
     init_params = copy.deepcopy(params)
 
@@ -264,7 +271,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('paramsV4.txt', 'r') as f:
+    with open('params2l.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:
