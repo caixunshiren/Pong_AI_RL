@@ -1,9 +1,10 @@
 import numpy as np
 import tensorflow.compat.v1 as tf
 import math
+
+
 #from tensorflow.python.framework import ops
 tf.compat.v1.disable_eager_execution()
-
 
 def convert_advantage_factor(Rtrain, gamma):
     Rtrain_modified = []
@@ -16,7 +17,6 @@ def convert_advantage_factor(Rtrain, gamma):
     return Rtrain_modified
 
 def concat_training_set(Xtrain, Ytrain, Rtrain):
-
     X = []
     R = []
 
@@ -194,8 +194,8 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     NN structure:
         600 features ----> 200 nets ----> sigmoid calculates P(up)
     '''
-
     #hyperparameters
+    
     gamma = 0.99
     learning_rate = 0.01
 
@@ -207,7 +207,7 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     #print(params)
 
     params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 10, minibatch_size = 32, print_cost = True)
-
+    tf.reset_default_graph()
     #print(params)
     '''
     for key in params:
@@ -220,12 +220,6 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     print("---------------------------")
     print("---------------------------")
     return params
-
-
-
-
-
-
 
 
 
@@ -280,8 +274,12 @@ def  test():
     params['b2'] = np.zeros((1,1))
 
     #print(params)
-
     params = train_bot(Xtrain, Ytrain, Rtrain, params)
 
 
 #test()
+
+
+
+
+
