@@ -5,9 +5,13 @@ ball_pos_history = [(1,2), (3,4), (4,5)] # [(x, y), (x,y) ..
 # just put some junk in there at first
 predicted_pos = 133+7
 
-cache = {"v":[], "n":0, "d1":0, "a":0, "p1":0, "p2":0, "table_size":0, "case":0 }
+#cache = {"v":[], "n":0, "d1":0, "a":0, "p1":0, "p2":0, "table_size":0, "case":0 }
 
 state = "new_game"
+
+def reinit():
+    global ball_pos_history
+    ball_pos_history = [(1,2), (3,4), (4,5)]
 
 def get_velocity(p1, p2):
     return ((p2[0]-p1[0], p2[1]-p1[1]))
@@ -65,23 +69,23 @@ def predict_position(p1, p2, table_size, h):
             return p1[1]+7.5+table_size[0]*(v[1]/v[0])
         '''
         if v[1] < 0 and abs(table_size[0]*(v[1]/v[0])) < p1[1]:
-            cache["v"] = v
-            cache["n"] = "na"
-            cache["d1"] = "na"
-            cache["a"] = "na"
-            cache["p1"] = p1
-            cache["p2"] = p2
-            cache["table_size"] = table_size
+            #cache["v"] = v
+            #cache["n"] = "na"
+            #cache["d1"] = "na"
+            #cache["a"] = "na"
+            #cache["p1"] = p1
+            #cache["p2"] = p2
+            #cache["table_size"] = table_size
             return p1[1]+7.5+table_size[0]*(v[1]/v[0])
 
         if v[1] > 0 and abs(table_size[0]*(v[1]/v[0])) < table_size[1] - p1[1]:
-            cache["v"] = v
-            cache["n"] = "na"
-            cache["d1"] = "na"
-            cache["a"] = "na"
-            cache["p1"] = p1
-            cache["p2"] = p2
-            cache["table_size"] = table_size
+            #cache["v"] = v
+            #cache["n"] = "na"
+            #cache["d1"] = "na"
+            #cache["a"] = "na"
+            #cache["p1"] = p1
+            #cache["p2"] = p2
+            #cache["table_size"] = table_size
             return p1[1]+7.5+table_size[0]*(v[1]/v[0])
 
         d1 = v[0]/abs(v[1])
@@ -100,41 +104,41 @@ def predict_position(p1, p2, table_size, h):
 
         #store to cache
         #cache = {"v":[], "n":0, "d1":0, "a":0, "p1":0, "p2":0, "table_size":0 }
-        cache["v"] = v
-        cache["n"] = n
-        cache["d1"] = d1
-        cache["a"] = a
-        cache["p1"] = p1
-        cache["p2"] = p2
-        cache["table_size"] = table_size
+        #cache["v"] = v
+        #cache["n"] = n
+        #cache["d1"] = d1
+        #cache["a"] = a
+        #cache["p1"] = p1
+        #cache["p2"] = p2
+        #cache["table_size"] = table_size
 
         #cases
         if n%2 == 0 and v[1] > 0:
             #k = 7.5 + a*(abs(v[1])/v[0])
             #if k < 0 or k > 280: print("case 1:", k)
-            cache["case"] = "case 1"
+            #cache["case"] = "case 1"
             return 7.5 + a*(abs(v[1])/v[0])
 
         if n%2 == 0 and v[1] < 0:
             #k = 272.5 - a*(abs(v[1])/v[0])
             #if k < 0 or k > 280: print("case 2:", k)
-            cache["case"] = "case 2"
+            #cache["case"] = "case 2"
             return 272.5 - a*(abs(v[1])/v[0])
 
         if n%2 == 1 and v[1] > 0:
             #k = 272.5 - a*(abs(v[1])/v[0])
             #if k < 0 or k > 280: print("case 3:", k)
-            cache["case"] = "case 3"
+            #cache["case"] = "case 3"
             return 272.5 - a*(abs(v[1])/v[0])
 
         if n%2 == 1 and v[1] < 0:
             #k = 7.5 + a*(abs(v[1])/v[0])
             #if k < 0 or k > 280: print("case 4:", k)
-            cache["case"] = "case 4"
+            #cache["case"] = "case 4"
             return 7.5 + a*(abs(v[1])/v[0])
 
     except:
-        print("exception")
+        #print("exception")
         return predicted_pos
 
 def get_sqr_dist(a, b):
@@ -145,26 +149,26 @@ def check_state(paddle_frect, other_paddle_frect, ball_frect):
     #print("flip")
     if get_sqr_dist(paddle_frect, ball_frect) < get_sqr_dist(other_paddle_frect, ball_frect):
         state = "chaser_mode"
-        print("switched to:",state)
+        #print("switched to:",state)
 
     else:
         state = "predict_mode"
-        print("switched to:",state)
+        #print("switched to:",state)
 
 def check_win(paddle_frect, other_paddle_frect, ball_frect):
     if paddle_frect.pos[0] > ball_frect.pos[0] and paddle_frect.pos[0] < 100:
-        print("opponent win")
+        #print("opponent win")
         state = "new_game"
-        print_cache()
+        #print_cache()
     elif paddle_frect.pos[0] < ball_frect.pos[0] and paddle_frect.pos[0] > 300:
-        print("opponent win")
+        #print("opponent win")
         state = "new_game"
-        print_cache()
+        #print_cache()
     elif other_paddle_frect.pos[0] > ball_frect.pos[0] and other_paddle_frect.pos[0] < 100:
-        print("you win")
+        #print("you win")
         state = "new_game"
     elif other_paddle_frect.pos[0] < ball_frect.pos[0] and other_paddle_frect.pos[0] > 300:
-        print("you win")
+        #print("you win")
         state = "new_game"
 
 def print_cache():
@@ -172,7 +176,7 @@ def print_cache():
     print(cache)
     print(predicted_pos)
 
-def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size):
+def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
     global ball_pos_history # wish we had classes
     global predicted_pos
     global state
