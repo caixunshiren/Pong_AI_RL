@@ -57,8 +57,8 @@ def render_frame(p1_frect, p2_frect, b_frect, table_size, half_paddle_width, hal
     bottom_right_y = round(b_frect.pos[1] - half_ball_dim)
     cv2.rectangle(img, (top_left_x, top_left_y), (bottom_right_x, bottom_right_y), 1, -1)
     # downscale # can be downscaled more if necessary...
-    return img[::SCALE_FACTOR, ::SCALE_FACTOR].transpose()[:,:,0] # cv2 and what we use use different conventions
-
+    return img[::SCALE_FACTOR, ::SCALE_FACTOR].transpose() # cv2 and what we use use different conventions
+    # 2D array!
 
 def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n_f, table_size):
     global frame
@@ -132,10 +132,11 @@ def sigmoid(x):
 
 def forward_prop(x):
     global params
-    x = np.array([x]).T
-    h = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
-    h[h<0] = 0 # ReLU introduces non-linearity
-    logp = np.dot(params['W2'], h) + params['b2']# This is a logits function and outputs a decimal.   (1 x H) . (H x 1) = 1 (scalar)
+    x = np.array(x).T 
+    h = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x H) (88 x 56) . (56 x 88) = (88 x 88) 
+    h[h<0] = 0 # ReLU introduces non-linearity # (88 x 88)
+    h2 = np.dot(params['W2'], h) + params['b2'] # (1 x 88) . (88 x 88 = (1 x 88)
+    logp = np.dot(params['W3'], h2.T) + params['b3'] # (1 x 88) x (88 x 1) = 1 (scalar)
     p = sigmoid(logp)  # squashes output to  between 0 & 1 range
     return p
 
@@ -162,7 +163,8 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     else:
      return "up"
     '''
-    action_prob = forward_prop(frame_info[-1])
+    action_prob = forward_prop(frame_info[-1]) # 1 x 88 ?? 
+
     ret = 'up' if np.random.uniform() < action_prob else 'down'
     y = 1 if ret == 'up' else 0
     Ytrain.append(y)
@@ -226,6 +228,7 @@ def save_training_sets():
 ########### The Weights ############
 
 H = TABLE_SIZE[0]//SCALE_FACTOR
+
 D = TABLE_SIZE[1]//SCALE_FACTOR
 
 mode = 'new'
@@ -234,9 +237,10 @@ params = {}
 if mode == 'new':
     params['W1'] = np.random.randn(H,D) / np.sqrt(D) # "Xavier" initialization - Shape will be H x D
     params['W2'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
+    params['W3'] = np.random.randn(1,H) / np.sqrt(H) # Shape will be H
     params['b1'] = np.zeros((H,1))
     params['b2'] = np.zeros((1,1))
-
+    params['b3'] = np.zeros((1,1))
     init_params = copy.deepcopy(params)
     for key in params:
         init_params[key] = init_params[key].tolist()
