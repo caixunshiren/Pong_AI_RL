@@ -35,7 +35,6 @@ def modified_jack_loss(eps_reward):
     return policy_loss
 return loss
 
-
 def make_models(input_shape):
     # assuming SCALE_FACTOR = 5 
     # (88 x 56 x 1) -> conv2d -> conv2d -> flatten -> 1x1
@@ -59,8 +58,7 @@ def make_models(input_shape):
     
     return train_model, run_model
    
-
-def train_model(train_model, img_list, action_list, rewards_list, output_list):
+def train_model(train_model, img_list, action_list, rewards_list):
     # take from pongbot, np.arrays
     # Rtrain is already processed?
     rewards = np.expand_dims(rewards_list, 1)
@@ -69,9 +67,7 @@ def train_model(train_model, img_list, action_list, rewards_list, output_list):
     print("X:", img_list.shape)
     print("Y:", action_list.shape)
     print("R:", rewards_list.shape)
-
     train_model.fit(x=[img_list, rewards], y=y_true)
-
 
 def convert_advantage_factor(Rtrain, gamma):
     Rtrain_modified = []
@@ -81,24 +77,6 @@ def convert_advantage_factor(Rtrain, gamma):
         Rtrain_modified.append(round)
     #Optional: normalize the reward
     return Rtrain_modified
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
