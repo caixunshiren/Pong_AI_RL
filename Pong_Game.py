@@ -391,7 +391,7 @@ def init_game(last_round = False, ep = -1):
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     display = 0
-    if ep == -1 or ep % 1000 == 0:
+    if ep == -1 or ep % 100 == 0:
         display = 1
 
     paddles[0].move_getter = RLbot.pongbot
@@ -445,8 +445,16 @@ if __name__ == '__main__':
 
 ######### Log ##########
 '''
+params2l1:
+10000 episodes of l1 = 200, l2 = 10, gamma = 0.95, X = 800
 
+params2l2:
+5000 episodes of l1 = 400, l2 = 200, gamma = 0.95, X = 800
 
+next time try: gamma = 0.95
+past 200 frames --> 1600
+l1 = 800
+l2 = 400
 '''
 
 

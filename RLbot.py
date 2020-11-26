@@ -138,7 +138,7 @@ def forward_prop(x):
     A1 = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
     A1[A1<0] = 0 # ReLU introduces non-linearity
 
-    A2 = np.dot(params['W2'], A1) + params['b2'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
+    A2 = np.dot(params['W2'], A1) + params['b2'] # (H x D) . (D x 1) = (H x 1) (20 x 1)
     A2[A2<0] = 0 # ReLU introduces non-linearity
 
     A3 = np.dot(params['W3'], A2) + params['b3']# This is a logits function and outputs a decimal.   (1 x H) . (H x 1) = 1 (scalar)
@@ -161,7 +161,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     check_side(paddle_frect)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 100, table_size)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 200, table_size)
 
 
 
@@ -175,6 +175,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
      return "up"
     '''
     action_prob = forward_prop(frame_info[-1])
+    #print(action_prob)
     ret = 'up' if np.random.uniform() < action_prob else 'down'
     y = 1 if ret == 'up' else 0
     Ytrain.append(y)
@@ -223,7 +224,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params2l.txt'
+    filename = 'params2l3.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -245,9 +246,9 @@ def save_training_sets():
 
 ########### The Weights ############
 
-H1 = 200
-H2 = 20
-D = 800
+H1 = 800
+H2 = 400
+D = 1600
 
 mode = 'new'
 params = {}
@@ -271,7 +272,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params2l.txt', 'r') as f:
+    with open('params2l3.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:
