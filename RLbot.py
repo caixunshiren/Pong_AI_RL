@@ -1,11 +1,14 @@
 import numpy as np
 import copy
+import bot1_v1
 
 frame = 1
 cur_side = 'left'
 cur_reward = 0
 last_score = [0,0]
 reset = False
+
+predicted_pos = 140
 
 #frame_info
 '''
@@ -37,6 +40,7 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
     global frame_info
     global cur_reward
     global reward_info
+    global predicted_pos
 
     #update reward
     reward_info.append(cur_reward)
@@ -53,6 +57,9 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
             cur_frame_info.append(other_paddle_frect.pos[0] / table_size[0] - 0.5)
             cur_frame_info.append(other_paddle_frect.pos[1] / table_size[1] - 0.5)
             cur_frame_info.append((other_paddle_frect.pos[1]+70) / table_size[1] - 0.5)
+
+            cur_frame_info.append((predicted_pos) / table_size[1] - 0.5)
+
         #print(len(cur_frame_info))
         #print(cur_frame_info)
         #print("----------")
@@ -65,7 +72,10 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
         cur_frame_info.append(other_paddle_frect.pos[0] / table_size[0] - 0.5)
         cur_frame_info.append(other_paddle_frect.pos[1] / table_size[1] - 0.5)
         cur_frame_info.append((other_paddle_frect.pos[1]+70) / table_size[1] - 0.5)
-        cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-2][0:-8])
+
+        cur_frame_info.append((predicted_pos) / table_size[1] - 0.5)
+
+        cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-2][0:-9])
 
     #print(len(cur_frame_info))
     #print(cur_frame_info)
@@ -128,6 +138,7 @@ def reset_round():
     frame_1_info = []
     frame_info = []
     reward_info = []
+    bot1_v1.init()
 
 def sigmoid(x):
   return 1.0 / (1.0 + np.exp(-x))
@@ -152,7 +163,10 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     global Ytrain
     global Rtrain
 
+    global predicted_pos
+
     #print(score, last_score)
+    predicted_pos = bot1_v1.get_pred_pos(paddle_frect, other_paddle_frect, ball_frect, table_size, score)
 
     check_side(paddle_frect)
     update_reward(score)
@@ -171,7 +185,9 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
      return "up"
     '''
     action_prob = forward_prop(frame_info[-1])
+    #print(action_prob)
     ret = 'up' if np.random.uniform() < action_prob else 'down'
+    #ret = 'up' if 0.5001 < action_prob else 'down'
     y = 1 if ret == 'up' else 0
     Ytrain.append(y)
 
@@ -219,7 +235,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'paramsV4.txt'
+    filename = 'paramsV8.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -242,7 +258,7 @@ def save_training_sets():
 ########### The Weights ############
 
 H = 400
-D = 800
+D = 900
 
 mode = 'load'
 params = {}
@@ -264,7 +280,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('paramsV4.txt', 'r') as f:
+    with open('paramsV8.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:

@@ -199,7 +199,7 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
 
     #hyperparameters
-    gamma = 0.985
+    gamma = 0.97
     learning_rate = 0.001
 
     #Data Processing

@@ -176,6 +176,24 @@ def print_cache():
     print(cache)
     print(predicted_pos)
 
+def init():
+    global ball_pos_history
+    ball_pos_history = [(1,2), (3,4), (4,5)]
+
+def get_pred_pos(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
+    global ball_pos_history # wish we had classes
+    global predicted_pos
+    global state
+    ball_pos_history.append(ball_frect.pos)
+    if if_flip(ball_pos_history):
+
+        check_state(paddle_frect, other_paddle_frect, ball_frect)
+
+        v = get_velocity(ball_pos_history[-2], ball_pos_history[-1])
+        if (((v[0] < 0) and (paddle_frect.pos[0] < table_size[0]/2)) or ((v[0]>0) and (paddle_frect.pos[0]>table_size[0]/2))):
+            predicted_pos = predict_position(ball_pos_history[-2], ball_pos_history[-1], table_size, ball_pos_history[-3][1])
+    return predicted_pos
+
 def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
     global ball_pos_history # wish we had classes
     global predicted_pos
