@@ -451,8 +451,8 @@ params2l1:
 params2l2:
 5000 episodes of l1 = 400, l2 = 200, gamma = 0.95, X = 800
 
-next time try: gamma = 0.95
-past 200 frames --> 1600
+next time try: gamma = 0.96
+past 100 frames --> 800
 l1 = 800
 l2 = 400
 '''

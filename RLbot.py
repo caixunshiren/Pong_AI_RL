@@ -161,7 +161,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     check_side(paddle_frect)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 200, table_size)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 100, table_size)
 
 
 
@@ -248,7 +248,7 @@ def save_training_sets():
 
 H1 = 800
 H2 = 400
-D = 1600
+D = 800
 
 mode = 'new'
 params = {}
