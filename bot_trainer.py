@@ -40,8 +40,8 @@ def concat_training_set(Xtrain, Ytrain, Rtrain):
     #print(R)
 
     #Optional: normalize the reward
-    #R -= np.mean(R) #normalizing the result
-    #R /= np.std(R) #idem using standar deviation
+    R -= np.mean(R) #normalizing the result
+    R /= np.std(R) #idem using standar deviation
 
     return X, Y, R
 
@@ -123,19 +123,25 @@ def compute_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
 
     m = X.shape[1]                  # number of training examples
     mini_batches = []
+
+    permutation = list(np.random.permutation(m))
+    shuffled_X = X[:, permutation]
+    shuffled_Y = Y[:, permutation].reshape((Y.shape[0],m))
+    shuffled_R = R[:, permutation].reshape((R.shape[0],m))
+
     num_complete_minibatches = math.floor(m/mini_batch_size) # number of mini batches of size mini_batch_size in your partitionning
     for k in range(0, num_complete_minibatches):
-        mini_batch_X = X[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
-        mini_batch_Y = Y[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
-        mini_batch_R = R[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
+        mini_batch_X = shuffled_X[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
+        mini_batch_Y = shuffled_Y[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
+        mini_batch_R = shuffled_R[:, k * mini_batch_size : k * mini_batch_size + mini_batch_size]
         mini_batch = (mini_batch_X, mini_batch_Y, mini_batch_R)
         mini_batches.append(mini_batch)
 
     # Handling the end case (last mini-batch < mini_batch_size)
     if m % mini_batch_size != 0:
-        mini_batch_X = X[:, num_complete_minibatches * mini_batch_size : m]
-        mini_batch_Y = Y[:, num_complete_minibatches * mini_batch_size : m]
-        mini_batch_R = R[:, num_complete_minibatches * mini_batch_size : m]
+        mini_batch_X = shuffled_X[:, num_complete_minibatches * mini_batch_size : m]
+        mini_batch_Y = shuffled_Y[:, num_complete_minibatches * mini_batch_size : m]
+        mini_batch_R = shuffled_R[:, num_complete_minibatches * mini_batch_size : m]
         mini_batch = (mini_batch_X, mini_batch_Y, mini_batch_R)
         mini_batches.append(mini_batch)
 
@@ -213,7 +219,7 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
 
     #hyperparameters
-    gamma = 0.97
+    gamma = 0.9995
     learning_rate = 0.003
 
     #Data Processing

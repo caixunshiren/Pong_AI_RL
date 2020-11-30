@@ -391,7 +391,7 @@ def init_game(last_round = False, ep = -1):
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     display = 0
-    if ep == -1 or ep % 100 == 0:
+    if ep == -1 or ep % 50 == 0:
         display = 1
 
     paddles[0].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
@@ -427,11 +427,11 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 10000
+    training_episode= 30000
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
-        init_game(False, i)
+        init_game(False,i)
         print("Episode",i+1,"Training Ended")
         print("##############################")
 
@@ -462,7 +462,7 @@ l2 = 400
 10000 + 6000 + 1000 + 10000 + 10000
 
 single side:
-10000 +2000
+10000 +
 '''
 
 

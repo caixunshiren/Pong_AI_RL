@@ -161,7 +161,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     check_side(paddle_frect, score)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 100, table_size)
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 4, table_size)
 
 
 
@@ -225,7 +225,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params2l3.txt'
+    filename = 'params2lsmall9995.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -247,9 +247,9 @@ def save_training_sets():
 
 ########### The Weights ############
 
-H1 = 800
-H2 = 400
-D = 800
+H1 = 200
+H2 = 200
+D = 32
 
 mode = 'load'
 params = {}
@@ -273,7 +273,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params2l3.txt', 'r') as f:
+    with open('params2lsmall9995.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:
