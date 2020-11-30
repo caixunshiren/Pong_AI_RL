@@ -82,7 +82,7 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
 
     return
 
-def check_side(paddle_frect):
+def check_side(paddle_frect, score):
     global cur_side
     global last_score
 
@@ -91,7 +91,7 @@ def check_side(paddle_frect):
     else:
         side = 'right'
 
-    if side != cur_side:
+    if score == [0,0] or side != cur_side:
         cur_side = side
         last_score = [0,0]
 
@@ -100,10 +100,15 @@ def update_reward(score):
     global reset
     global cur_side
     global last_score
+    global frame
 
     if score[0] == last_score[0] and score[1] == last_score[1]:
-        reward = 0
-        #print(last_score)
+        cur_reward = 0
+        if frame > 3:
+
+            if check_hit():
+                cur_reward = 0.05
+                #cur_reward = 0
     else:
         #print(score)
         #print(last_score)
@@ -145,6 +150,26 @@ def forward_prop(x):
     A3 = sigmoid(A3)  # squashes output to  between 0 & 1 range
     return A3
 
+def if_flip():
+    global frame_info
+    x1 = frame_info[-1][0] + 0.5
+    x2 = frame_info[-2][0] + 0.5
+    x3 = frame_info[-3][0] + 0.5
+    if (x1-x2) > 0 and (x2-x3) < 0:
+        return True
+    if (x1-x2) < 0 and (x2-x3) > 0:
+        return True
+    return False
+
+def check_hit():
+    global cur_side
+    global frame_info
+    if if_flip():
+        if cur_side == 'left' and frame_info[-1][0] < 0:
+            return True
+        if cur_side == 'right' and frame_info[-1][0] > 0:
+            return True
+        return False
 #This is the main function
 def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []):
     global last_score
@@ -158,7 +183,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
 
     #print(score, last_score)
 
-    check_side(paddle_frect)
+    check_side(paddle_frect, score)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
     store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 100, table_size)
@@ -174,7 +199,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     else:
      return "up"
     '''
-    action_prob = forward_prop(frame_info[-1])
+    action_prob = float(forward_prop(frame_info[-1]))
     #print(action_prob)
     ret = 'up' if np.random.uniform() < action_prob else 'down'
     y = 1 if ret == 'up' else 0
@@ -188,6 +213,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
         #pass info to training
         Xtrain.append(frame_info)
         Rtrain.append(reward_info)
+        #print(reward_info)
         #reset
         reset_round()
         reset = False
@@ -224,7 +250,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params2l3.txt'
+    filename = 'params2l_colab.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -246,11 +272,11 @@ def save_training_sets():
 
 ########### The Weights ############
 
-H1 = 800
-H2 = 400
+H1 = 400
+H2 = 200
 D = 800
 
-mode = 'new'
+mode = 'load'
 params = {}
 
 if mode == 'new':
@@ -272,7 +298,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params2l3.txt', 'r') as f:
+    with open('params2l_colab.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:

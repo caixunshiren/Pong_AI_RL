@@ -9,8 +9,12 @@ tf.compat.v1.disable_eager_execution()
 def convert_advantage_factor(Rtrain, gamma):
     Rtrain_modified = []
     for round in Rtrain:
-        for i in range(0, len(round)):
-            round[i] = gamma**(len(round)-i)
+        start_pos = [i for i, e in enumerate(round) if e != 0]
+        #print(start_pos)
+        for pos in start_pos:
+            for i in range(0, pos):
+                round[i] = round[i] + gamma**(pos-i) * round[pos]
+
         Rtrain_modified.append(round)
     #Optional: normalize the reward
 
@@ -209,16 +213,18 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
 
     #hyperparameters
     gamma = 0.96
-    learning_rate = 0.003
+    learning_rate = 0.001
 
     #Data Processing
+    #print(Rtrain)
     Rtrain = convert_advantage_factor(Rtrain, gamma)
+    #print(Rtrain)
     X, Y, R = concat_training_set(Xtrain, Ytrain, Rtrain)
 
     #Placeholder
     #print(params)
 
-    params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 1, minibatch_size = 32, print_cost = True)
+    params = shallow_model(X,Y,R, params, learning_rate, num_epochs = 3, minibatch_size = 32, print_cost = True)
     tf.reset_default_graph()
     #print(params)
     '''
@@ -258,6 +264,12 @@ def normalization(X):
 ############
 import json
 
+def test2():
+    gamma = 0.9
+    Rtrain = [[0,0,0.5,0,0,0,0,1],[0,0,0,0.5,0,0,0,0,-1]]
+    convert_advantage_factor(Rtrain, gamma)
+    print(Rtrain)
+
 def  test():
     Xtrain = []
     Ytrain = []
@@ -296,4 +308,4 @@ def  test():
     params = train_bot(Xtrain, Ytrain, Rtrain, params)
 
 
-#test()
+#test2()
