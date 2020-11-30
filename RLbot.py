@@ -2,7 +2,7 @@ import numpy as np
 import copy
 
 frame = 1
-cur_side = 'left'
+cur_side = 'right'
 cur_reward = 0
 last_score = [0,0]
 reset = False
@@ -82,7 +82,7 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
 
     return
 
-def check_side(paddle_frect):
+def check_side(paddle_frect, score):
     global cur_side
     global last_score
 
@@ -91,7 +91,7 @@ def check_side(paddle_frect):
     else:
         side = 'right'
 
-    if side != cur_side:
+    if side != cur_side or score == [0,0]:
         cur_side = side
         last_score = [0,0]
 
@@ -158,7 +158,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
 
     #print(score, last_score)
 
-    check_side(paddle_frect)
+    check_side(paddle_frect, score)
     update_reward(score)
     #store_frame_info(paddle_frect, other_paddle_frect, ball_frect)
     store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 100, table_size)
@@ -211,6 +211,7 @@ def train():
     global params
     print("---------------------------")
     print("Training Data Collected!")
+    #print(Rtrain)
     params = bt.train_bot(Xtrain, Ytrain, Rtrain, params)
     Xtrain = []
     Ytrain = []
@@ -250,7 +251,7 @@ H1 = 800
 H2 = 400
 D = 800
 
-mode = 'new'
+mode = 'load'
 params = {}
 
 if mode == 'new':

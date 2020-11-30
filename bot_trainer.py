@@ -12,6 +12,7 @@ def convert_advantage_factor(Rtrain, gamma):
         for i in range(0, len(round)):
             round[i] = gamma**(len(round)-i)
         Rtrain_modified.append(round)
+
     #Optional: normalize the reward
 
     return Rtrain_modified
@@ -37,6 +38,10 @@ def concat_training_set(Xtrain, Ytrain, Rtrain):
     #print(X)
     #print(Y)
     #print(R)
+
+    #Optional: normalize the reward
+    #R -= np.mean(R) #normalizing the result
+    #R /= np.std(R) #idem using standar deviation
 
     return X, Y, R
 
@@ -208,7 +213,7 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
 
     #hyperparameters
-    gamma = 0.96
+    gamma = 0.97
     learning_rate = 0.003
 
     #Data Processing

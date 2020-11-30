@@ -394,11 +394,13 @@ def init_game(last_round = False, ep = -1):
     if ep == -1 or ep % 100 == 0:
         display = 1
 
-    paddles[0].move_getter = RLbot.pongbot
-    paddles[1].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
+    paddles[0].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
+    paddles[1].move_getter = RLbot.pongbot
 
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
+
+    '''
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
     screen.blit(pygame.font.Font(None, 32).render(str('SWITCHING SIDES'), True, white), [int(0.6*table_size[0])-8, 0])
 
@@ -411,7 +413,7 @@ def init_game(last_round = False, ep = -1):
 
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
-
+    '''
     #Training starts here:
     RLbot.train()
     #RLbot.save_training_sets()
@@ -451,10 +453,16 @@ params2l1:
 params2l2:
 5000 episodes of l1 = 400, l2 = 200, gamma = 0.95, X = 800
 
-next time try: gamma = 0.96
+params2l3:
+gamma = 0.96
 past 100 frames --> 800
 l1 = 800
 l2 = 400
+
+10000 + 6000 + 1000 + 10000 + 10000
+
+single side:
+10000 +2000
 '''
 
 
