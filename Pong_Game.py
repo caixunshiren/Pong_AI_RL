@@ -391,7 +391,7 @@ def init_game(last_round = False, ep = -1):
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     display = 0
-    if ep == -1 or ep % 50 == 0:
+    if ep == -1 or ep % 250 == 0:
         display = 1
 
     paddles[0].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
@@ -441,7 +441,6 @@ if __name__ == '__main__':
     print("Episode",training_episode,"Training Ended")
     print("##############################")
     pygame.quit()
-
     #RLbot.save_params()
 
 
@@ -462,7 +461,7 @@ l2 = 400
 10000 + 6000 + 1000 + 10000 + 10000
 
 single side:
-10000 +
+30000 + 9000 + 18000 + 30000
 '''
 
 

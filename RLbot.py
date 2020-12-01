@@ -225,7 +225,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params2lsmall9995.txt'
+    filename = 'params2lsmall9999.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -273,7 +273,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params2lsmall9995.txt', 'r') as f:
+    with open('params2lsmall9999.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:
