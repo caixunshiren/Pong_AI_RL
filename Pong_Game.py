@@ -28,7 +28,11 @@ import chaser_ai
 
 import RLbot
 
+import bot1
+
 import bot1_v1
+
+import bot1_finetune_right
 
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -376,7 +380,7 @@ def init_game(last_round = False, ep = -1):
     wall_bounce = 1.00
     dust_error = 0.00
     init_speed_mag = 2
-    timeout = 0.0003
+    timeout = 0.0001
     clock_rate = 80
     turn_wait_rate = 3
     score_to_win = 5
@@ -394,8 +398,8 @@ def init_game(last_round = False, ep = -1):
     if ep == -1 or ep % 250 == 0:
         display = 1
 
-    paddles[0].move_getter = chaser_ai.pong_ai #chaser_ai.pong_ai
-    paddles[1].move_getter = RLbot.pongbot
+    paddles[0].move_getter = bot1_v1.pongbot #chaser_ai.pong_ai
+    paddles[1].move_getter = bot1_finetune_right.pongbot#RLbot.pongbot
 
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
@@ -427,7 +431,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 30000
+    training_episode= 10000
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
@@ -446,22 +450,8 @@ if __name__ == '__main__':
 
 ######### Log ##########
 '''
-params2l1:
-10000 episodes of l1 = 200, l2 = 10, gamma = 0.95, X = 800
-
-params2l2:
-5000 episodes of l1 = 400, l2 = 200, gamma = 0.95, X = 800
-
-params2l3:
-gamma = 0.96
-past 100 frames --> 800
-l1 = 800
-l2 = 400
-
-10000 + 6000 + 1000 + 10000 + 10000
-
-single side:
-30000 + 9000 + 18000 + 30000
+gamma: 0.9995
+3000 + 2000 + 5000
 '''
 
 

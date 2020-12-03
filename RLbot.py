@@ -6,7 +6,9 @@ cur_side = 'right'
 cur_reward = 0
 last_score = [0,0]
 reset = False
+cumulative_frame = 0
 
+valid_frames = []
 #frame_info
 '''
 bx
@@ -122,7 +124,10 @@ def reset_round():
     global frame_1_info
     global frame_info
     global reward_info
+    global valid_frames
+    global cumulative_frame
 
+    cumulative_frame += frame - 1
     frame = 1
     cur_reward = 0
     frame_1_info = []
@@ -144,6 +149,22 @@ def forward_prop(x):
     A3 = np.dot(params['W3'], A2) + params['b3']# This is a logits function and outputs a decimal.   (1 x H) . (H x 1) = 1 (scalar)
     A3 = sigmoid(A3)  # squashes output to  between 0 & 1 range
     return A3
+
+def get_ret():
+    global frame_info
+    global valid_frames
+    global frame
+    global cumulative_frame
+    try:
+        action_prob = forward_prop(frame_info[-1])
+        #print(action_prob)
+        ret = 'up' if np.random.uniform() < action_prob else 'down'
+        valid_frames.append(cumulative_frame+frame-1)
+        #print(valid_frames[-1])
+        return ret
+    except:
+        print("error in get_ret()")
+        return 'up' if np.random.uniform() < 0.5 else 'down'
 
 #This is the main function
 def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []):
@@ -179,6 +200,17 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
     ret = 'up' if np.random.uniform() < action_prob else 'down'
     y = 1 if ret == 'up' else 0
     Ytrain.append(y)
+    return ret
+
+def update(score):
+    global last_score
+    global reset
+    global frame
+    global frame_info
+    global reward_info
+    global Xtrain
+    global Ytrain
+    global Rtrain
 
     #end, update global variables
     frame += 1
@@ -192,7 +224,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score = []
         reset_round()
         reset = False
 
-    return ret
+
 
 
 
@@ -209,13 +241,18 @@ def train():
     global Ytrain
     global Rtrain
     global params
+    global valid_frames
+    global cumulative_frame
     print("---------------------------")
     print("Training Data Collected!")
-    #print(Rtrain)
-    params = bt.train_bot(Xtrain, Ytrain, Rtrain, params)
+    print(cumulative_frame)
+    print(len(Ytrain))
+    params = bt.train_bot(Xtrain, Ytrain, Rtrain, params, valid_frames)
     Xtrain = []
     Ytrain = []
     Rtrain = []
+    valid_frames = []
+    cumulative_frame = 0
     print("Parameters Updated Successfully!")
 
 def save_params():
@@ -225,7 +262,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params2lsmall9999.txt'
+    filename = 'params2lfine_tune.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -273,7 +310,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params2lsmall9999.txt', 'r') as f:
+    with open('params2lfine_tune.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:

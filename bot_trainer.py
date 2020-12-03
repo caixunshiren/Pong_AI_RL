@@ -6,11 +6,22 @@ import math
 tf.compat.v1.disable_eager_execution()
 
 
+def discount_rewards(r):
+    gamma = 0.99
+    discounted_r = np.zeros_like(r)
+    running_add = 0
+    for t in reversed(range(0, len(r))): # xrange is no longer supported in Python 3
+        if r[t] != 0: running_add = 0 # reset the sum, since this was a game boundary (pong specific!)
+        running_add = running_add * gamma + r[t]
+        discounted_r[t] = running_add
+    return discounted_r
+
 def convert_advantage_factor(Rtrain, gamma):
     Rtrain_modified = []
     for round in Rtrain:
+        fac = round[-1]
         for i in range(0, len(round)):
-            round[i] = gamma**(len(round)-i)
+            round[i] = fac*gamma**(len(round)-i)
         Rtrain_modified.append(round)
 
     #Optional: normalize the reward
@@ -39,9 +50,42 @@ def concat_training_set(Xtrain, Ytrain, Rtrain):
     #print(Y)
     #print(R)
 
+
+
+    return X, Y, R
+
+
+
+def concat_training_set_with_vf(Xtrain, Ytrain, Rtrain, vf):
+
+    X = []
+    R = []
+
+    for round_x, round_r in zip(Xtrain, Rtrain):
+        X = X + round_x
+        R = R+round_r
+
+    X = np.array(X).T
+    Y = np.array([Ytrain])
+    R = np.array([R])
+
+    X = X[:,vf]
+    Y = Y[:,vf]
+    R = R[:,vf]
+
+    print("1. Checking Input Shapes:")
+    print("X:",X.shape)
+    print("Y:",Y.shape)
+    print("R:",R.shape)
+    print("  ")
+    print("  ")
+    #print(X)
+    #print(Y)
+    #print(R)
+
     #Optional: normalize the reward
-    R -= np.mean(R) #normalizing the result
-    R /= np.std(R) #idem using standar deviation
+    #R -= np.mean(R) #normalizing the result
+    #R /= np.std(R) #idem using standar deviation
 
     return X, Y, R
 
@@ -105,7 +149,7 @@ def forward_propagation(A_0,parameters):
 
 def loss(logit, label, reward, m):
     entr = label * -tf.log(logit) + (1-label) * -tf.log(1-logit)
-    return -tf.reduce_sum(reward * entr)
+    return tf.reduce_sum(reward * entr)
 
 def compute_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
     """
@@ -208,7 +252,7 @@ def shallow_model(X,Y,R, params, learning_rate, num_epochs = 1500, minibatch_siz
 
 
 
-def train_bot(Xtrain, Ytrain, Rtrain, params):
+def train_bot(Xtrain, Ytrain, Rtrain, params, vf):
     print("---------------------------")
     print("---------------------------")
     print("Policy Training Start")
@@ -219,12 +263,14 @@ def train_bot(Xtrain, Ytrain, Rtrain, params):
     '''
 
     #hyperparameters
-    gamma = 0.9999
+    gamma = 0.9995
     learning_rate = 0.003
 
     #Data Processing
     Rtrain = convert_advantage_factor(Rtrain, gamma)
-    X, Y, R = concat_training_set(Xtrain, Ytrain, Rtrain)
+    #X, Y, R = concat_training_set(Xtrain, Ytrain, Rtrain)
+    X, Y, R = concat_training_set_with_vf(Xtrain, Ytrain, Rtrain, vf)
+    #R = get_discounted_onehot(R, gamma)
 
     #Placeholder
     #print(params)
@@ -269,6 +315,22 @@ def normalization(X):
 ############
 import json
 
+def test3():
+    X = [[[1,2,3],[2,2,3],[3,2,3],[4,2,3],[5,2,3]],[[6,2,3],[7,2,3],[8,2,3],[9,2,3],[10,2,3]]]
+    Y = [1,0,0,1,0,0,1,0,0,1]
+    R = [[0,0,0,0,-1],[0,0,0,0,1]]
+    vf = [0,3,5,9]
+
+    R = convert_advantage_factor(R, 0.99)
+
+    X, Y, R = concat_training_set_with_vf(X, Y, R, vf)
+    print(X,Y,R)
+
+def test2():
+    #a = convert_advantage_factor([[0,0,0,0,1], [0,0,0,0,0,-1]], 0.99)
+    a = discount_rewards([0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,1])
+    print(a)
+
 def  test():
     Xtrain = []
     Ytrain = []
@@ -307,4 +369,4 @@ def  test():
     params = train_bot(Xtrain, Ytrain, Rtrain, params)
 
 
-#test()
+#test2()
