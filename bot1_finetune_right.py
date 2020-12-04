@@ -232,7 +232,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
     return controller(predicted_pos, paddle_frect.pos[1], paddle_frect, other_paddle_frect, ball_frect, table_size, score, vy)
 
 def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size, score, vy):
-    threshold = 5000
+    threshold = 5
     if vy < threshold:
         if 35 > abs(desired_pos-35 - current_pos):
             ret = get_ret()
@@ -245,7 +245,7 @@ def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_
             else:
                 return "up"
     else:
-        #print("chaser")
+        print("chaser")
         update()
         if 30 > abs(desired_pos-35 - current_pos):
             return pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size)

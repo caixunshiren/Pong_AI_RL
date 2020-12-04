@@ -34,6 +34,7 @@ import bot1_v1
 
 import bot1_finetune_right
 import bot1_finetune_left
+import finetune_bot_final
 
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -399,8 +400,8 @@ def init_game(last_round = False, ep = -1):
     if ep == -1 or ep % 250 == 0:
         display = 1
 
-    paddles[0].move_getter = bot1_v1.pongbot#bot1_finetune_left.pongbot #chaser_ai.pong_ai
-    paddles[1].move_getter = bot1_finetune_right.pongbot#RLbot.pongbot
+    paddles[0].move_getter = finetune_bot_final.pongbot#bot1_finetune_left.pongbot #chaser_ai.pong_ai
+    paddles[1].move_getter = bot1_v1.pongbot
 
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)

@@ -233,7 +233,7 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
     return controller(predicted_pos, paddle_frect.pos[1], paddle_frect, other_paddle_frect, ball_frect, table_size, score, vy)
 
 def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size, score, vy):
-    threshold = 5
+    threshold = 7
     if vy < threshold:
         if 35 > abs(desired_pos-35 - current_pos):
             ret = get_ret()
