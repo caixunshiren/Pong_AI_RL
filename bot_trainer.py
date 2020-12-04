@@ -25,7 +25,6 @@ def concat_training_set(Xtrain, Ytrain, Rtrain):
     for round_x, round_r in zip(Xtrain, Rtrain):
         X = X + round_x
         R = R+round_r
-
     X = np.array(X).T
     Y = np.array([Ytrain])
     R = np.array([R])
