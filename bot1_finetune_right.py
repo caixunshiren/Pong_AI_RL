@@ -206,8 +206,8 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
 
     ball_pos_history.append(ball_frect.pos)
 
-    if state == "new_game" and ball_pos_history[-3][0] > 100 and ball_pos_history[-3][0] < 300:
-        predicted_pos = predict_position(ball_pos_history[-2], ball_pos_history[-1], table_size, ball_pos_history[-3][1])
+    #if state == "new_game" and ball_pos_history[-3][0] > 100 and ball_pos_history[-3][0] < 300:
+    #    predicted_pos = predict_position(ball_pos_history[-2], ball_pos_history[-1], table_size, ball_pos_history[-3][1])
 
     if if_flip(ball_pos_history): # could make slightly faster by calculating get_velocity in outside loop and passing v to func instead
         #print("flip!")
@@ -226,20 +226,34 @@ def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size, score):
         update(True)
         return pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size)
 
-    return controller(predicted_pos, paddle_frect.pos[1], paddle_frect, other_paddle_frect, ball_frect, table_size, score)
+    #use chaser if y velocity is too high:
+    vy = abs(get_velocity(ball_pos_history[-2], ball_pos_history[-1])[1])
 
-def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size, score):
+    return controller(predicted_pos, paddle_frect.pos[1], paddle_frect, other_paddle_frect, ball_frect, table_size, score, vy)
 
-    if 35 > abs(desired_pos-35 - current_pos):
-        ret = get_ret()
-        update()
-        return ret
-    else:
-        update()
-        if current_pos < desired_pos-35:
-            return "down"
+def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size, score, vy):
+    threshold = 5
+    if vy < threshold:
+        if 35 > abs(desired_pos-35 - current_pos):
+            ret = get_ret()
+            update()
+            return ret
         else:
-            return "up"
+            update()
+            if current_pos < desired_pos-35:
+                return "down"
+            else:
+                return "up"
+    else:
+        #print("chaser")
+        update()
+        if 30 > abs(desired_pos-35 - current_pos):
+            return pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size)
+        else:
+            if current_pos < desired_pos-35:
+                return "down"
+            else:
+                return "up"
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 

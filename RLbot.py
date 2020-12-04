@@ -2,7 +2,7 @@ import numpy as np
 import copy
 
 frame = 1
-cur_side = 'right'
+cur_side = 'left'
 cur_reward = 0
 last_score = [0,0]
 reset = False
@@ -262,7 +262,7 @@ def save_params():
         #print(type(params[key]))
         #print(params[key])
 
-    filename = 'params2lfine_tune.txt'
+    filename = 'params2lfine_tune_left.txt'
 
     with open(filename, 'w') as f:
         f.write(json.dumps(params))
@@ -310,7 +310,7 @@ if mode == 'new':
 
 elif mode == 'load':
 
-    with open('params2lfine_tune.txt', 'r') as f:
+    with open('params2lfine_tune_left.txt', 'r') as f:
         params = json.load(f)
 
     for key in params:
