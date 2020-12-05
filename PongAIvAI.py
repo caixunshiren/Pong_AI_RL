@@ -254,7 +254,7 @@ def timeout(func, args=(), kwargs={}, timeout_duration=1, default=None):
     it = InterruptableThread()
     it.start()
     it.join(timeout_duration)
-    if it.isAlive():
+    if it.is_alive():
         print("TIMEOUT")
         return default
     else:
@@ -388,8 +388,8 @@ def init_game():
     import pong_ai
     import pong_ai_2
 
-    paddles[0].move_getter = pong_ai_2.pong_ai
-    paddles[1].move_getter = bot1_v1.pongbot#chaser_ai.pong_ai #pong_ai_2.pong_ai
+    paddles[0].move_getter = chaser_ai.pong_ai #pong_ai_2.pong_ai
+    paddles[1].move_getter = pong_ai_2.pong_ai#bot1_v1.pongbot#chaser_ai.pong_ai #pong_ai_2.pong_ai
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
