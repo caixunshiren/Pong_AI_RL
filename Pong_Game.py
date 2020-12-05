@@ -383,7 +383,7 @@ def init_game(last_round = False, ep = -1):
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0001
-    clock_rate = 8000
+    clock_rate = 800
     turn_wait_rate = 3
     score_to_win = 1000
 
@@ -400,8 +400,8 @@ def init_game(last_round = False, ep = -1):
     if ep == -1 or ep % 250 == 0:
         display = 1
 
-    paddles[0].move_getter = finetune_bot_final.pongbot#bot1_finetune_left.pongbot #chaser_ai.pong_ai
-    paddles[1].move_getter = bot1_v1.pongbot
+    paddles[0].move_getter = bot1_finetune_left.pongbot #chaser_ai.pong_ai
+    paddles[1].move_getter = bot1_v1.pongbot#finetune_bot_final.pongbot#bot1_v1.pongbot
 
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display, ep)
@@ -433,7 +433,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 10000
+    training_episode= 5000
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
@@ -452,8 +452,8 @@ if __name__ == '__main__':
 
 ######### Log ##########
 '''
-gamma: 0.9995
-3000 + 2000 + 5000
+gamma: 0.997
+
 '''
 
 
