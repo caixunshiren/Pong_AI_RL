@@ -385,7 +385,7 @@ def init_game(last_round = False, ep = -1):
     timeout = 0.0001
     clock_rate = 8000
     turn_wait_rate = 3
-    score_to_win = 1000
+    score_to_win = 5
 
     bot1_v1.reinit()
 
@@ -400,7 +400,7 @@ def init_game(last_round = False, ep = -1):
     if ep == -1 or ep % 250 == 0:
         display = 1
 
-    paddles[0].move_getter = finetune_bot_final.pongbot #chaser_ai.pong_ai
+    paddles[0].move_getter = bot1_v1.pongbot#finetune_bot_final.pongbot #chaser_ai.pong_ai
     paddles[1].move_getter = bot1_finetune_right.pongbot#RLbot.pongbot
 
 
@@ -433,7 +433,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 10000
+    training_episode= 5000
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
