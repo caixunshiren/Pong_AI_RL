@@ -342,6 +342,7 @@ def forward_prop(x):
     A1 = np.dot(params['W1'], x) + params['b1'] # (H x D) . (D x 1) = (H x 1) (200 x 1)
     A1[A1<0] = 0 # ReLU introduces non-linearity
 
+    #A2 = A1
     A2 = np.dot(params['W2'], A1) + params['b2'] # (H x D) . (D x 1) = (H x 1) (20 x 1)
     A2[A2<0] = 0 # ReLU introduces non-linearity
 
