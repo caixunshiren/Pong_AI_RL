@@ -10,9 +10,6 @@ Output: P(up) for the bot
         Input: 32   -->RELU-->    layer 1: 200 neurons    -->RELU-->        layer 2: 200 neurons     -->sigmoid-->      P(up)
 
 side note: We know that 200 neurons for both layers are way too many but its too late to change it xxD --- and it works (in many cases)!
-For training code and more models we tried and are currently trying, visit our repo:
-https://github.com/caixunshiren/Pong_AI_RL
-https://github.com/ihasdapie/pong_180
 '''
 ############## code ###############
 import math
