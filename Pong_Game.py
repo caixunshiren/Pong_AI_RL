@@ -34,6 +34,8 @@ import bot1_v1
 
 import bot1_finetune_right
 
+import finetune_bot_final
+
 white = [255, 255, 255]
 black = [0, 0, 0]
 clock = pygame.time.Clock()
@@ -381,9 +383,9 @@ def init_game(last_round = False, ep = -1):
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0001
-    clock_rate = 80
+    clock_rate = 8000
     turn_wait_rate = 3
-    score_to_win = 5
+    score_to_win = 1000
 
     bot1_v1.reinit()
 
@@ -398,7 +400,7 @@ def init_game(last_round = False, ep = -1):
     if ep == -1 or ep % 250 == 0:
         display = 1
 
-    paddles[0].move_getter = bot1_v1.pongbot #chaser_ai.pong_ai
+    paddles[0].move_getter = finetune_bot_final.pongbot #chaser_ai.pong_ai
     paddles[1].move_getter = bot1_finetune_right.pongbot#RLbot.pongbot
 
 
@@ -452,6 +454,8 @@ if __name__ == '__main__':
 '''
 gamma: 0.9995
 3000 + 2000 + 5000
+
+3000 + 6000
 '''
 
 
