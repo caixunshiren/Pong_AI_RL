@@ -235,9 +235,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size, vy):
     #controls the bot --- under prediction mode
     threshold = 9
-    global side
-    #if side == "right":
-    #    threshold = 7 #a guess from trials
     if vy < threshold:
         if 35 > abs(desired_pos-35 - current_pos):
             ret = get_ret()
