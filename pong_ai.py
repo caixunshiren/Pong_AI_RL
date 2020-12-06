@@ -1,23 +1,29 @@
+################ READ ME ##################
 '''
 THE FRANKENSTEIN BOT
 BY JACK CAI & BRIAN CHEN
 
 This bot is a combination of the closed form solution to the position prediction, the chaser ai, and reinforcement learning for optimizing the best aim.
 
+It worked best practically among all the models we made.
+
 The NN for the reinforcement learning:
-Input: 8 position data from 4 frames = 32
+Input: 8 position data from 5 frames = 5*8 = 40
 Output: P(up) for the bot
         Input: 40   -->RELU-->    layer 1: 50 neurons    -->RELU-->        layer 2: 50 neurons     -->sigmoid-->      P(up)
 
-side note: We know that 50 neurons for both layers are way too many but its too late to change it xxD --- and it works (in many cases)!
-For training code and more models we tried and are currently trying, visit our repo:
+side notes: We know that 50 neurons for both layers are way too many but somehow it works ... also tried single hidden layer but it end up converging to 0.5 somehow ...
+By the last hour, we realized that the game can be mirrored simply by table_size_x - ball_x. Should've done that from the beginning to reduce half of the training time!
+
+This file only contains the trained weights so no training codes inside.
+For training code and more models we tried and are currently trying, visit our repo at:
 https://github.com/caixunshiren/Pong_AI_RL
 https://github.com/ihasdapie/pong_180
 '''
 ############## code ###############
 import math
 
-# some useful global variables
+# some useful global variables ... they are initialized arbitrarily
 ball_pos_history = [(200,200), (202,200), (204,200)] # [(x, y), (x,y) ..
 predicted_pos = 133+7
 #cache = {"v":[], "n":0, "d1":0, "a":0, "p1":0, "p2":0, "table_size":0, "case":0 }

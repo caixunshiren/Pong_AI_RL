@@ -389,8 +389,8 @@ def init_game():
     import pong_ai_2
     import anglebot
 
-    paddles[0].move_getter = pong_ai.pong_ai
-    paddles[1].move_getter = anglebot.pongbot#bot1_v1.pongbot#chaser_ai.pong_ai #pong_ai_2.pong_ai
+    paddles[1].move_getter = pong_ai.pong_ai
+    paddles[0].move_getter = anglebot.pongbot#bot1_v1.pongbot#chaser_ai.pong_ai #pong_ai_2.pong_ai
 
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
