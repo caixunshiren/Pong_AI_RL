@@ -435,7 +435,7 @@ if __name__ == '__main__':
 
 
     pygame.init()
-    training_episode= 5000
+    training_episode= 2000
     for i in range(training_episode-1):
         print("##############################")
         print("Episode",i+1,"Training Start")
@@ -454,7 +454,7 @@ if __name__ == '__main__':
 
 ######### Log ##########
 '''
-gamma: 0.997
+
 
 '''
 
