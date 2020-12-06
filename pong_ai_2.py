@@ -196,12 +196,19 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global predicted_pos
     global state
 
-    #store nessacerry info
-    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 5, table_size)
-    ball_pos_history.append(ball_frect.pos)
-
     #check states
     check_side(paddle_frect)
+
+    #store nessacerry info
+    store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, 5, table_size)
+
+    global side
+    if side == "left":
+        ball_pos_history.append(ball_frect.pos)
+    elif side == "right":
+        posi = (table_size[0] - ball_frect.pos[0],ball_frect.pos[1])
+        ball_pos_history.append(ball_frect.pos)
+
 
     if if_flip(ball_pos_history):
 
@@ -228,6 +235,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size, vy):
     #controls the bot --- under prediction mode
     threshold = 9
+    global side
+    #if side == "right":
+    #    threshold = 7 #a guess from trials
     if vy < threshold:
         if 35 > abs(desired_pos-35 - current_pos):
             ret = get_ret()

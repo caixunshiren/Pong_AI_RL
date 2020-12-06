@@ -1,0 +1,308 @@
+import math
+
+ball_pos_history = [(1,2), (3,4), (4,5)] # [(x, y), (x,y) ..
+# just put some junk in there at first
+predicted_pos = 133+7
+ideal_pos = 133+7
+
+cache = {"v":[], "n":0, "d1":0, "a":0, "p1":0, "p2":0, "table_size":0, "case":0 }
+
+state = "new_game"
+
+def get_velocity(p1, p2):
+    return ((p2[0]-p1[0], p2[1]-p1[1]))
+def mag(tup):
+    return (((tup[0]**2) +(tup[1]**2))**0.5)
+
+def isclose(a, b, rel_tol=1e-03, abs_tol=0.0):
+    return abs(a-b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
+def get_velocity_flip(ph):
+    # just need to find when it speeds up!
+    # not reliable b.c. float calculations...
+    # need to set threshold
+    try:
+        return not isclose(mag(get_velocity(ph[-1], ph[-2])), mag(get_velocity(ph[-2], ph[-3])))
+    except:
+        return False
+    # for checking for sign flip
+    # in retrospect i should pre-calculate get_velocity
+    # return (get_velocity(ph[-1], ph[-2])[0] < 0 and get_velocity(ph[-2], ph[-3])[0] > 0) or (get_velocity(ph[-1], ph[-2])[0] > 0 and get_velocity(ph[-2], ph[-3])[0] < 0)
+
+def if_flip(ph):
+    return (get_velocity(ph[-2], ph[-3])[0] < 0 and get_velocity(ph[-3], ph[-4])[0] > 0) or (get_velocity(ph[-2], ph[-3])[0] > 0 and get_velocity(ph[-3], ph[-4])[0] < 0)
+
+def predict_position(p1, p2, table_size, h):
+    # returns distance between y = 0 and predicted final position when it "scores"
+    #   /<-
+    #  /
+    # /
+    #. p1
+    # \
+    #  \
+    #   \-> p2
+    #print("predictied height:", h)
+    v = get_velocity(p1, p2)
+    #print("calculated: ",v)
+    #return (((table_size[0] - ((table_size[1]-p1[1])*(v[0]/v[1])))) % (table_size[1]*(v[0]/v[1])))*(v[1]/v[0])
+    #Jack:
+
+    #maybe change to something like:
+    table_size = (table_size[0]-70, table_size[1]-15)
+    try:
+        v = list(v)
+        v[0] = abs(v[0])
+        #if no bounce
+        '''
+        if abs((p1[1])*(v[0]/v[1])) > table_size[0]:
+            cache["v"] = v
+            cache["n"] = "na"
+            cache["d1"] = "na"
+            cache["a"] = "na"
+            cache["p1"] = p1
+            cache["p2"] = p2
+            cache["table_size"] = table_size
+            return p1[1]+7.5+table_size[0]*(v[1]/v[0])
+        '''
+        if v[1] < 0 and abs(table_size[0]*(v[1]/v[0])) < p1[1]:
+            cache["v"] = v
+            cache["n"] = "na"
+            cache["d1"] = "na"
+            cache["a"] = "na"
+            cache["p1"] = p1
+            cache["p2"] = p2
+            cache["table_size"] = table_size
+            return p1[1]+7.5+table_size[0]*(v[1]/v[0])
+
+        if v[1] > 0 and abs(table_size[0]*(v[1]/v[0])) < table_size[1] - p1[1]:
+            cache["v"] = v
+            cache["n"] = "na"
+            cache["d1"] = "na"
+            cache["a"] = "na"
+            cache["p1"] = p1
+            cache["p2"] = p2
+            cache["table_size"] = table_size
+            return p1[1]+7.5+table_size[0]*(v[1]/v[0])
+
+        d1 = v[0]/abs(v[1])
+        #number of bounces
+        if v[1] > 0:
+            d1 = (table_size[1] - p1[1])*d1
+        else:
+            d1 = p1[1]*d1
+        #print("d1 is :", d1)
+
+        n = (table_size[0] - d1) // (table_size[1]*(v[0]/abs(v[1]))) + 1
+        #print("n is :", n)
+
+        a = (table_size[0] - d1) % (table_size[1]*(v[0]/abs(v[1])))
+        #print("a is :", a)
+
+        #store to cache
+        #cache = {"v":[], "n":0, "d1":0, "a":0, "p1":0, "p2":0, "table_size":0 }
+        cache["v"] = v
+        cache["n"] = n
+        cache["d1"] = d1
+        cache["a"] = a
+        cache["p1"] = p1
+        cache["p2"] = p2
+        cache["table_size"] = table_size
+
+        #cases
+        if n%2 == 0 and v[1] > 0:
+            #k = 7.5 + a*(abs(v[1])/v[0])
+            #if k < 0 or k > 280: print("case 1:", k)
+            cache["case"] = "case 1"
+            return 7.5 + a*(abs(v[1])/v[0])
+
+        if n%2 == 0 and v[1] < 0:
+            #k = 272.5 - a*(abs(v[1])/v[0])
+            #if k < 0 or k > 280: print("case 2:", k)
+            cache["case"] = "case 2"
+            return 272.5 - a*(abs(v[1])/v[0])
+
+        if n%2 == 1 and v[1] > 0:
+            #k = 272.5 - a*(abs(v[1])/v[0])
+            #if k < 0 or k > 280: print("case 3:", k)
+            cache["case"] = "case 3"
+            return 272.5 - a*(abs(v[1])/v[0])
+
+        if n%2 == 1 and v[1] < 0:
+            #k = 7.5 + a*(abs(v[1])/v[0])
+            #if k < 0 or k > 280: print("case 4:", k)
+            cache["case"] = "case 4"
+            return 7.5 + a*(abs(v[1])/v[0])
+
+    except:
+        print("exception")
+        return predicted_pos
+
+def get_sqr_dist(a, b):
+    return (a.pos[0]-b.pos[0])**2 + (a.pos[1]-b.pos[1])**2
+
+def check_state(paddle_frect, other_paddle_frect, ball_frect):
+    global state
+    #print("flip")
+    if get_sqr_dist(paddle_frect, ball_frect) < get_sqr_dist(other_paddle_frect, ball_frect):
+        state = "chaser_mode"
+        print("switched to:",state)
+
+    else:
+        state = "predict_mode"
+        print("switched to:",state)
+
+def check_win(paddle_frect, other_paddle_frect, ball_frect):
+    global state
+    if paddle_frect.pos[0] > ball_frect.pos[0] and paddle_frect.pos[0] < 100:
+        print("opponent win")
+        state = "new_game"
+        print_cache()
+    elif paddle_frect.pos[0] < ball_frect.pos[0] and paddle_frect.pos[0] > 300:
+        print("opponent win")
+        state = "new_game"
+        print_cache()
+    elif other_paddle_frect.pos[0] > ball_frect.pos[0] and other_paddle_frect.pos[0] < 100:
+        print("you win")
+        state = "new_game"
+    elif other_paddle_frect.pos[0] < ball_frect.pos[0] and other_paddle_frect.pos[0] > 300:
+        print("you win")
+        state = "new_game"
+
+def print_cache():
+    global predicted_pos
+    print(cache)
+    print(predicted_pos)
+
+def get_paddle_angle(y, pfrect, facing):
+    # y = distance from centre
+    max_angle = 45 
+    # size = (10, 70) # paddle_size
+    #frect.size is same as paddle.size
+    center =pfrect.pos[1]+pfrect.size[1]/2
+    rel_dist_from_c = ((y-center)/pfrect.size[1])
+    rel_dist_from_c = min(0.5, rel_dist_from_c)
+    rel_dist_from_c = max(-0.5, rel_dist_from_c)
+    sign = 1-2*facing
+    return sign*rel_dist_from_c*max_angle*math.pi/180
+
+
+def get_return_velocity_direction(ball, paddle, table_size, v, facing):
+    # assuming that the speed does not get randomized... not much we can do about that
+    theta = get_paddle_angle(ball.pos[1]+.5*ball.size[1], paddle, facing)
+    v = [math.cos(theta)*v[0]-math.sin(theta)*v[1],
+                 math.sin(theta)*v[0]+math.cos(theta)*v[1]]
+    v[0] = -v[0]
+    v = [math.cos(-theta)*v[0]-math.sin(-theta)*v[1],
+                  math.cos(-theta)*v[1]+math.sin(-theta)*v[0]]
+    return v
+
+
+def get_opt_pose(pf, opf, bf, v, predpos, facing, table_size):
+    # pf=paddle_frect, opf = other_paddle_frect, bf=ball_frect, v=incoming_velocity,
+
+    # returns ideal offset from predicted pos: 
+        # -'ve values for offset above,
+        # +'ve values for offset below
+    #    /<-
+    #   /
+    # |* (Optimal contact point)__
+    # | \                         | <- offset
+    # |* (predicted_pos)        --
+    # |   \
+    # |    \->
+    
+    # iterate through all possible collision points @ predpos 
+    # find the offset to give furthest final distance from the opponent's paddle's current pos
+    max_disp = 0
+    int_predpos = int(predpos)
+    halfsize = int(pf.size[1]/2)
+    minbound = int_predpos - halfsize
+    maxbound = int_predpos + halfsize
+
+    minbound = int_predpos if minbound < predpos else minbound 
+    maxbound = table_size[1]-halfsize if maxbound > table_size[1]-halfsize else maxbound
+
+    ideal_pos = predpos
+    # this does it to the nearest 1/100 of a pixel. Maybe overkill. 
+    # can make faster by distributing calc across multiple frames?
+    # print("Minbound:", minbound, "maxbound:", maxbound)
+    for i in range(1+(minbound*10), 1-(maxbound*10)): # restrict range a little bit to be safe
+        i = i/10
+        ball = bf.copy()
+        ball.pos = (pf.pos[0], predpos) # create a ball that is in line with our paddle
+        paddle = pf.copy()
+        paddle.pos=(pf.pos[0], i) # create a paddle that is at a possible location
+        v_ret = get_return_velocity_direction(ball, paddle , table_size, v, facing)
+        #step once forward with new velocity to get final displacement
+        d = predict_position(ball.pos, (ball.pos[0]+v_ret[0], paddle.pos[1]+v_ret[1]), table_size, 0)
+        d = abs(d-opf.pos[1]) # get distance between reflected ball and current other paddle pos on y axis
+        if d > max_disp:
+            max_disp = d
+            ideal_pos = i
+    # print("generated ideal_pos= ", ideal_pos, " predicted_pos= ", predpos, " offset= ", abs(predpos-ideal_pos) )
+
+    return ideal_pos - predicted_pos
+
+def pongbot(paddle_frect, other_paddle_frect, ball_frect, table_size):
+    global ball_pos_history # wish we had classes
+    global predicted_pos
+    global state
+    global ideal_pos
+    facing = 1 if paddle_frect.pos[0] > table_size[0]/2 else 0
+
+    ball_pos_history.append(ball_frect.pos)
+    #print(ball_pos_history)
+    #v = get_velocity(ball_pos_history[-2], ball_pos_history[-1]) # -'ve x velocity means going to the left
+
+    if if_flip(ball_pos_history): # could make slightly faster by calculating get_velocity in outside loop and passing v to func insteaad
+        #print("flip!")
+
+        check_state(paddle_frect, other_paddle_frect, ball_frect)
+
+        v = get_velocity(ball_pos_history[-2], ball_pos_history[-1]) # -'ve x velocity means going to the left
+        #TODO Jack, do we need to check w/ -2, -3 here too?
+        
+        # update predicted_pos only when opponent hits the ball
+        if (((v[0] < 0) and (paddle_frect.pos[0] < table_size[0]/2)) or ((v[0]>0) and (paddle_frect.pos[0]>table_size[0]/2))):
+            predicted_pos = predict_position(ball_pos_history[-2], ball_pos_history[-1], table_size, ball_pos_history[-3][1])
+            offset = get_opt_pose(paddle_frect, other_paddle_frect, ball_frect, v, predicted_pos, facing, table_size)
+            ideal_pos = predicted_pos + offset
+
+        #else:
+        #   return pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size)
+
+    check_win(paddle_frect, other_paddle_frect, ball_frect)
+
+    if state == "chaser_mode" or state == "new_game":
+        return pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size)
+    
+    # return controller(predicted_pos, paddle_frect.pos[1], paddle_frect, other_paddle_frect, ball_frect, table_size)
+    return controller(ideal_pos, paddle_frect.pos[1], paddle_frect, other_paddle_frect, ball_frect, table_size)
+
+def controller(desired_pos, current_pos, paddle_frect, other_paddle_frect, ball_frect, table_size):
+    # just something basic for now! move centroid of paddle to predicted pos
+    '''
+    if current_pos < desired_pos-35:
+        return "down"
+    else:
+        return "up"
+    '''
+    #if desired_pos > 272.5
+    #use chaser while in range
+    # if 30 > abs(desired_pos-35 - current_pos):
+    #     return pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size)
+    if False:
+        pass
+    else:
+        if current_pos < desired_pos-35:
+            return "down"
+        else:
+            return "up"
+
+
+
+def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
+    if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
+        return "down"
+    else:
+        return "up"
