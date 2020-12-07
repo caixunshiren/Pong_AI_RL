@@ -377,7 +377,7 @@ def init_game(last_round = False, ep = -1):
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 80
+    clock_rate = 800
     turn_wait_rate = 3
     score_to_win = 5
 

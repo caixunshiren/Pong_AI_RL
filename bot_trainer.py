@@ -9,8 +9,9 @@ tf.compat.v1.disable_eager_execution()
 def convert_advantage_factor(Rtrain, gamma):
     Rtrain_modified = []
     for round in Rtrain:
+        fac =round[-1]
         for i in range(0, len(round)):
-            round[i] = gamma**(len(round)-i)
+            round[i] = fac*gamma**(len(round)-i)
         Rtrain_modified.append(round)
 
     #Optional: normalize the reward
@@ -105,7 +106,7 @@ def forward_propagation(A_0,parameters):
 
 def loss(logit, label, reward, m):
     entr = label * -tf.log(logit) + (1-label) * -tf.log(1-logit)
-    return -tf.reduce_sum(reward * entr)
+    return tf.reduce_sum(reward * entr)
 
 def compute_mini_batches(X, Y, R, mini_batch_size = 64, seed = 0):
     """

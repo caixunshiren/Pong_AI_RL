@@ -33,7 +33,6 @@ Rtrain = []
 
 def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n_f, table_size):
     global frame
-    #global frame_1_info
     global frame_info
     global cur_reward
     global reward_info
@@ -53,6 +52,8 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
             cur_frame_info.append(other_paddle_frect.pos[0] / table_size[0] - 0.5)
             cur_frame_info.append(other_paddle_frect.pos[1] / table_size[1] - 0.5)
             cur_frame_info.append((other_paddle_frect.pos[1]+70) / table_size[1] - 0.5)
+            cur_frame_info.append（1）
+            cur_frame_info.append（1）
         #print(len(cur_frame_info))
         #print(cur_frame_info)
         #print("----------")
@@ -66,6 +67,8 @@ def store_frame_info_more_frames(paddle_frect, other_paddle_frect, ball_frect, n
         cur_frame_info.append(other_paddle_frect.pos[1] / table_size[1] - 0.5)
         cur_frame_info.append((other_paddle_frect.pos[1]+70) / table_size[1] - 0.5)
         cur_frame_info = cur_frame_info + copy.deepcopy(frame_info[frame-2][0:-8])
+        cur_frame_info.append（1）
+        cur_frame_info.append（1）
 
     #print(len(cur_frame_info))
     #print(cur_frame_info)
@@ -249,7 +252,7 @@ def save_training_sets():
 
 H1 = 200
 H2 = 200
-D = 32
+D = 800
 
 mode = 'load'
 params = {}
